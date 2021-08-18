@@ -57,7 +57,7 @@ import axios from "axios"
                 
             },
             getCategory() {
-                axios.get('http://api-pos.beliayam.test/categories',{
+                axios.get(`${process.env.VUE_APP_BASE_HOST_API}/categories`,{
                         headers: {
                             "Authorization": "Bearer " + localStorage.getItem("jwt")
                         }

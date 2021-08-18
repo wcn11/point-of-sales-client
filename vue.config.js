@@ -1,5 +1,6 @@
+const path = require("path");
+
 module.exports = {
-    devServer: {
-        proxy: 'http://api-pos.beliayam.test/',
-    }
+  outputDir: path.resolve(__dirname, "../pos_production"),
+  //   assetsDir: "../../static/SPA"
 }

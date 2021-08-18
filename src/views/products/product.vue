@@ -85,7 +85,7 @@ export default {
     },
     methods: {
         getProducts(){
-          return axios.get(`http://api-pos.beliayam.test/products/${this.$route.params['categoryId']}`,{
+          return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/products/${this.$route.params['categoryId']}`,{
               headers: {
                   "Authorization": "Bearer " + localStorage.getItem("jwt")
               }
@@ -114,7 +114,7 @@ export default {
         addProduct(event, product){
 
 
-          axios.get(`http://api-pos.beliayam.test/add-product/${product['id']}`,{
+          axios.get(`${process.env.VUE_APP_BASE_HOST_API}/add-product/${product['id']}`,{
               headers: {
                   "Authorization": "Bearer " + localStorage.getItem("jwt")
               }

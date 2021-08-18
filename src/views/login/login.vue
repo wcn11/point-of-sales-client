@@ -7,7 +7,7 @@
       <div class="row">
         <div class="col-sm-6 login-section-wrapper">
           <div class="brand-wrapper">
-            <img :src="require('../../assets/assets_login/images/logo_navbar.png')" alt="Beliayam.com" class="logo">
+            <img :src="require('../../assets/images/logo_navbar.png')" alt="Beliayam.com" class="logo">
           </div>
           <div class="login-wrapper my-auto">
             <h1 class="login-title text-center">Masuk</h1>
@@ -27,7 +27,7 @@
           </div>
         </div>
         <div class="col-sm-6 px-0 d-none d-sm-block image-container">
-          <img :src="require('../../assets/assets_login/images/icon.png')" alt="login image" class="login-img">
+          <img :src="require('../../assets/logo.png')" alt="login image" class="login-img">
         </div>
       </div>
     </div>
@@ -39,10 +39,17 @@
 
 <script>
 import axios from 'axios';
-require('../../assets/assets_login/css/login.css')
+require('../../assets/css/login.css')
 
 export default {
     name: "login.vue",
+    metaInfo: {
+      titleTemplate: 'Masuk',
+      htmlAttrs: {
+        lang: 'en',
+        amp: true
+      }
+    },
     data(){
         return {
             email: "",
@@ -51,7 +58,7 @@ export default {
     },
     methods: {
         submit() {
-            axios.post('http://api-pos.beliayam.test/login',{
+            axios.post(`${process.env.VUE_APP_BASE_HOST_API}/login`,{
                 "email": this.email,
                 "password": this.password,
             }

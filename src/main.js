@@ -1,8 +1,8 @@
 import Vue from 'vue'
 import App from './App.vue'
 
-// window.$ = window.jQuery = require('./plugins/jquery.min')
-// require('./plugins/bootstrap.bundle')
+window.$ = window.jQuery = require('./plugins/jquery.min')
+require('./plugins/bootstrap.bundle')
 import VueAlertify from 'vue-alertify';
 
 import VueMeta from 'vue-meta'
