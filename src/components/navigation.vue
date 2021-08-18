@@ -554,7 +554,6 @@ export default {
     .nav .select a:before {
         font-family: "Font Awesome 5 Free";
         font-weight: 900;
-        content: "";
         position: absolute;
         right: 10px;
         top: 10px;
