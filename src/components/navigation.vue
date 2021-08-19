@@ -248,7 +248,7 @@ export default {
     methods: {
         pay(){
 
-            return axios.post('http://api-pos.beliayam.test/pay',
+            return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/pay`,
                 {
                     "customerNo": this.selectedCustomer,
                     "paymentAmount": this.bill,
@@ -285,6 +285,10 @@ export default {
                         this.$root.$emit('clearCarts')
 
                         this.$alertify.success("Berhasil Dibayarkan")
+                    }else{
+                        results['data']['d'].map(result => {
+                            this.$alertify.warning(result)
+                        })
                     }
                 }).catch(error => {
                         this.$alertify.error(error.response['data']['message'])
@@ -309,7 +313,7 @@ export default {
         },
         
         saveCustomer(){
-            return axios.post('http://api-pos.beliayam.test/customers',
+            return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/customers`,
                 {
                     "customer": this.addCustomer,
                 },
@@ -343,7 +347,7 @@ export default {
         },
         
         getCustomers(){
-            return axios.get('http://api-pos.beliayam.test/customers/52',{
+            return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/customers/52`,{
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("jwt")
                 }
@@ -351,6 +355,7 @@ export default {
                 .then(results => {
                     this.customers = results.data['d']
                 }).catch(error => {
+                    console.log(error.response)
                         this.$alertify.error(error.response['data']['message'])
                     })
         },
@@ -453,7 +458,7 @@ export default {
         },
         logout(){
             
-            axios.post('http://api-pos.beliayam.test/logout', {}, {
+            axios.post(`/logout`, {}, {
                 
                     headers: {
                         "Authorization": "Bearer " + localStorage.getItem("jwt")
