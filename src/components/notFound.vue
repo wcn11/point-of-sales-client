@@ -20,7 +20,7 @@ export default {
     name: "notFound",
     methods:{
         removeNav(){
-            document.querySelector(".nav").style.display = "none"
+            // document.querySelector(".nav").style.display = "none"
         }
     },
     mounted() {

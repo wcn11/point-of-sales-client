@@ -8,20 +8,49 @@
             </h2>
         </header>
 
+        <div class="row mt-5" v-if="loading">
 
+            <div class="col-md-3 col-sm-4" v-for="(count, index) in 8" :key="index">
+                <div class="resource">
 
-        <div class="row mt-5">
+                    <VueContentLoading :width="210" :height="190" class="shrimmer-container">
+                                    
+                        <rect width="210" height="190"/>
+                        <rect width="210" height="50" class="p-2"/>
+
+                    </VueContentLoading>
+
+                    <VueContentLoading :width="210" :height="50" class="shrimmer-container p-2">
+
+                        <rect width="210" height="50" class="p-2"/>
+
+                    </VueContentLoading>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5" v-else>
 
             <div class="col-md-3 col-sm-4" v-for="(category, index) in categories" :key="index">
                 <div class="resource">
 
                     <div class="no-gutters">
                         <div class="w-100">
-                            <router-link :to="{ name: 'products', params: {categoryId: category['id']}}"><img :src="getImage(category['slug'])" :alt="category['name']" class="img-fluid rounded"></router-link>
+                            <router-link :to="{ name: 'products', params: {categoryId: category['id']}}">
+
+                                <!-- <VueContentLoading :width="210" :height="150" class="shrimmer-container" v-if="loadingImageCategory">
+
+                                    <rect width="210" height="150" class="p-2"/>
+
+                                </VueContentLoading> -->
+
+                                <img :src="getImage(category['slug'])" :alt="category['name']" class="img-fluid rounded w-100">
+
+                            </router-link>
                         </div>
-                        <div class="w100">
+                        <div class="w-100">
                                 <router-link class="text-decoration-none text-dark" :to="{ name: 'products', params: {categoryId: category['id']}}">
-                                    <h5 class="p-2">{{ category['name'] }} </h5>
+                                    <h5 class="p-2 category-title nowrap">{{ category['name'] }} </h5>
                                 </router-link>
                         </div>
                     </div>
@@ -35,63 +64,104 @@
 
 <script>
 import axios from "axios"
+import { VclFacebook, VclInstagram, VueContentLoading } from 'vue-content-loading';
+
 
     export default {
         name: "category",
+        components: {
+            VueContentLoading
+        },
         data(){
             return {
-                categories: []
+                categories: [],
+                loading: false,
+                loadingImageCategory: false,
             }
         },
+        // watch: {
+        //     'categories': {
+        //         handler: function (val, oldVal) {
+        //             if(val){
+        //                 this.loading = true;
+        //             }else{
+        //                 this.loading = false;
+        //             }
+
+        //         },
+        //         deep: true
+        //     }
+        // },
         methods: {
             getImage(slug){
 
+                    this.loadingImageCategory = true
+
                 try {
 
-                    return require(`./../../assets/images/categories/${slug}.jpeg`)
+                    let image = require(`./../../assets/images/categories/${slug}.jpeg`)
+
+                    this.loadingImageCategory = false
+
+                    return image
 
                 }catch (e) {
-                    return require(`./../../assets/images/categories/default.jpg`)
+
+                    let image = require(`./../../assets/images/categories/default.jpg`)
+
+                    this.loadingImageCategory = false
+
+                    return image
                 }
 
                 
             },
             getCategory() {
-                axios.get(`${process.env.VUE_APP_BASE_HOST_API}/categories`,{
-                        headers: {
-                            "Authorization": "Bearer " + localStorage.getItem("jwt")
-                        }
-                    }).then(result => {
+                
+                this.loading = !this.loading;
 
-                        this.categories = result.data
-                        if(result.data){
-                            this.result = result.data.filter(value => {
-                                switch (value['name']) {
-                                    case "PARTING":
-                                        value['slug'] = "parting"
-                                        break;
-                                    case "Ayam Broiler":
-                                        value['slug'] = "broiler"
-                                        break;
-                                    case "Ayam Kampung":
-                                        value['slug'] = "kampung"
-                                        break;
-                                    case "Ayam Pejantan":
-                                        value['slug'] = "pejantan"
-                                        break;
-                                
-                                    default:
-                                        value['slug'] = "merah"
-                                        break;
-                                }
-                            })
-                        }
-                    }).catch(error => {
-                        this.$alertify.error(error.response['data']['message'])
-                    })
+                if(this.loading){
+
+
+                    axios.get(`${process.env.VUE_APP_BASE_HOST_API}/categories`,{
+                            headers: {
+                                "Authorization": "Bearer " + localStorage.getItem("jwt")
+                            }
+                        }).then(result => {
+
+                            this.categories = result.data
+                            if(result.data){
+                                this.result = result.data.filter(value => {
+                                    switch (value['name']) {
+                                        case "PARTING":
+                                            value['slug'] = "parting"
+                                            break;
+                                        case "Ayam Broiler":
+                                            value['slug'] = "broiler"
+                                            break;
+                                        case "Ayam Kampung":
+                                            value['slug'] = "kampung"
+                                            break;
+                                        case "Ayam Pejantan":
+                                            value['slug'] = "pejantan"
+                                            break;
+                                    
+                                        default:
+                                            value['slug'] = "merah"
+                                            break;
+                                    }
+                                })
+
+                                this.loading = !this.loading
+                            }
+                        }).catch(error => {
+                            this.$alertify.error(error.response['data']['message'])
+                        })
+
+                }
             }
         },
-        created() {
+        mounted() {
             this.getCategory()
         }
     }
@@ -130,8 +200,45 @@ import axios from "axios"
         border-radius: 7px;
     }
 
-    @media only screen and (max-width: 600px) {
+    .shrimmer-container{
+        border-radius: 10px;
+    }
 
+    .category-title{
+        font-size: 3vh;
+        white-space: nowrap;
+    }
+
+    .img-fluid{
+        max-height: 150px;
+    }
+
+    @media only screen and (max-width: 576px) {
+
+        .img-fluid{
+            max-height: 150px;
+        }
+    }
+
+    @media only screen and (max-width: 768px) {
+
+        .img-fluid{
+            max-height: 150px;
+        }
+    }
+
+    @media only screen and (max-width: 992px) {
+
+        .img-fluid{
+            max-height: 150px;
+        }
+    }
+
+    @media only screen and (max-width: 1200px) {
+
+        .img-fluid{
+            max-height: 230px;
+        }
     }
 
 </style>

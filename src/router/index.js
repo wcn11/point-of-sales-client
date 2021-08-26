@@ -8,7 +8,10 @@ import Stock from '../views/stock/stock'
 import Sale from '../views/sale/sale'
 import SalesReport from '../views/sales_report/sales_report'
 import Login from '../views/login/login'
+import StockDownload from '../pdf/stockDownload'
 import notFound from '../components/notFound.vue'
+import SalesReportDownload from '../pdf/SalesReportDownload.vue'
+import Invoice from '../pdf/Invoice.vue'
 
 Vue.use(VueRouter)
 
@@ -63,6 +66,20 @@ const router = new VueRouter({
             }
         },
         {
+            path: '/pay/invoice',
+                name: 'invoice',
+                component: Invoice,
+                meta: {
+                    requiresAuth: true
+                }
+            }, {
+                path: '/sales-report/download',
+                name: 'sales_report_download',
+                component: SalesReportDownload,
+                meta: {
+                    requiresAuth: true
+                }
+            }, {
             path: '/login',
             name: 'login',
             component: Login,
@@ -70,6 +87,13 @@ const router = new VueRouter({
                 requiresAuth: false
             }
         }, {
+            path: '/stock/:key/download',
+                name: 'stockDownload',
+                component: StockDownload,
+                meta: {
+                    requiresAuth: true
+                }
+            }, {
             // will match everything
             path: '*',
             name: 'notFound',

@@ -1,9 +1,12 @@
 <template>
 
-    <div class="footer card-footer">
-        Copyright 2021 by PT BELI AYAM COM. All Rights Reserved.
-        System Version 1.0.2-1 BETA
-    </div>
+      <footer class="footer bg-white text-dark">
+          <div class=" p-2">
+            <p>Copyright 2021 by PT. BELI AYAM COM. <br />
+                All Rights Reserved. System Version 1.0.2-1 BETA
+            </p>
+          </div>
+      </footer>
 
 </template>
 
@@ -16,14 +19,15 @@ export default {
 <style scoped>
 
     .footer {
-        position: absolute;
-        width: 100%;
-        bottom: 0;
-        background-color: #616161;
-        color: white;
-        text-align: center;
-        border-top-left-radius: 5px;
-        border-top-right-radius: 5px;
+      position: relative;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: red;
+      color: white;
+      text-align: center;
+  grid-row-start: 2;
+  grid-row-end: 3;
     }
 
 </style>

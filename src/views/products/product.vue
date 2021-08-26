@@ -1,21 +1,52 @@
 <template>
-    <div class="animate__animated animate__fadeInLeft">
+    <div class="">
 
         <header class="card-header header-category">
             <h2 class="headline">
             </h2>
         </header>
 
-        <aside class="card-header header-category">
+        <!-- <aside class="card-header header-category">
                 <div class="form-group row m-auto">
                     <label for="inputPassword" class="col-sm-2 col-form-label">Cari Produk...</label>
                     <div class="col-sm-10">
                         <input type="text" class="form-control" v-model="search" id="inputPassword" placeholder="Cari Produk...">
                     </div>
                 </div>
-        </aside>
+        </aside> -->
 
         <div class="row mt-5">
+
+            <!-- <div class="col-md-3 col-sm-4 resource-container">
+
+                <div class="card card-container">
+                    <div class="text-center">
+
+                        <VueContentLoading :width="210" :height="130" class="shrimmer-container p-2">
+
+                            <rect width="210" height="130"/>
+
+                        </VueContentLoading>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title card-title-product">{{ product['name'] }}</h5>
+
+                        <h6 class="price">{{ product['unitPrice'] | formatMoney }}</h6>
+
+                        <div class="d-flex justify-content-center" v-if="isProductOnCart(product['id']) == false">
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" :disabled="product['stock'] <= 0" class="btn btn-secondary" @click="addProduct($event, product)"><i class="fad fa-cart-plus"></i> Tambahkan</button>
+                            </div>
+                        </div>
+
+                        <div class="w-100 counter-cart text-center" v-else>
+                            <span @click="updateCart(product['id'])" class="counter"><i class="fad fa-minus-circle"></i></span>
+                            <span>{{ getQuantity(product['id']) }}</span>
+                            <span @click="updateCart(product['id'], 'plus')" class="counter"><i class="fad fa-plus-circle"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div> -->
 
             <div class="col-md-3 col-sm-4 resource-container" v-for="(product, index) in products" :key="index">
 
@@ -45,7 +76,27 @@
 
         </div>
 
-        <div class="modal fade animate__animated animate__fadeInUp" id="openModalRemoveProduct" tabindex="-1">
+
+
+        <!-- Modal -->
+        <div class="modal fade animate__animated animate__fadeInUp" id="modal-payment" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-static modal-dialog-scrollable modal-lg">
+                <div class="modal-content modal-bottom">
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <h3>
+                                Hapus Produk ?
+                            </h3>
+                        </div>
+                        <div class="modal-footer justify-content-around">
+                        <button class="btn btn-danger w-100" @click="removeProduct(selectedProduct)">Hapus</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="openModalRemoveProduct" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-static">
                 <div class="modal-content modal-bottom">
                     <div class="modal-body">
@@ -65,6 +116,7 @@
 <script>
 import axios from "axios"
 import $ from "jquery"
+// import { VueContentLoading } from 'vue-content-loading';
 
 export default {
     name: "product",
@@ -74,6 +126,9 @@ export default {
         lang: 'en',
         amp: true
       }
+    },
+    components: {
+        // VueContentLoading
     },
     data(){
         return {
@@ -107,9 +162,7 @@ export default {
                     })
         },
         openModalRemoveProduct(type = "show"){
-
           $("#openModalRemoveProduct").modal(type)
-
         },
         addProduct(event, product){
 
@@ -262,6 +315,11 @@ export default {
 </script>
 
 <style scoped>
+
+    .shrimmer-container{
+        border-radius: 10px;
+    }
+
 
     .header-category{
         text-align: center;

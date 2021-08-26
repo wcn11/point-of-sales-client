@@ -12,12 +12,18 @@
                 <label for="inputPassword" class="col-sm-3 col-form-label">Cari Laporan Penjualan...</label>
 
                 <div class="col-sm-8">
-                    <input type="text" class="form-control" v-model="search" id="inputPassword" placeholder="Cari Nomor, Tanggal, Pelanggan, Nilai Pembayaran...">
+                    <date-picker v-model="date" type="date" class="w-100" format='YYYY-MM-DD' range placeholder="Pilih Jarak Tanggal"></date-picker>
                 </div>
 
-<!--                <div class="col-sm-1">-->
-<!--                    <button class="btn btn-outline-secondary" @click="openModalFilter"><span></span><i class="fad fa-filter"></i></button>-->
-<!--                </div>-->
+            </div>
+
+            <div class="text-center row m-3">
+                <div class="col m-2">
+                    <button class="btn btn-secondary m-auto" @click="getProductsByDate"><i class="fad fa-search"></i> Cari</button>
+                </div>
+                <div class="col m-2" v-if="date">
+                    <button class="btn btn-default m-auto border" @click="print"><i class="fad fa-print"></i> Print</button>
+                </div>
             </div>
         </aside>
 
@@ -26,7 +32,7 @@
                 <div class="card card-head bg-success mb-3">
                     <div class="card-body text-white">
                         <h5 class="card-title">Pendapatan</h5>
-                        <p class="card-text">{{ 523000 | formatMoney }}</p>
+                        <p class="card-text">{{ commission | formatMoney }}</p>
                         <small>Pendapatan Bersih</small>
                     </div>
                 </div>
@@ -35,7 +41,7 @@
                 <div class="card card-head bg-warning mb-3">
                     <div class="card-body text-white">
                         <h5 class="card-title">Piutang</h5>
-                        <p class="card-text">{{ 1337500 | formatMoney }}</p>
+                        <p class="card-text">{{ debt | formatMoney }}</p>
                         <small>Nominal Yang Harus Di Berikan Kepada Pusat Setiap Minggu</small>
                     </div>
                 </div>
@@ -44,66 +50,23 @@
 
         <div class="row mt-2">
 
-            <div class="col-md-12 col-sm-12 resource-container">
-                <div class="resource">
-
-                    <div class="row no-gutters">
-                        <div class="table-responsive">
-                            <table class="table table-hover table-bordered">
-                                <thead>
-                                <tr>
-                                    <th>Produk</th>
-                                    <th>Persediaan Saat Ini</th>
-                                    <th>Penjualan</th>
-                                    <th>Piutang Persediaan</th>
-                                    <th>Sisa Persediaan</th>
-                                    <th>Harga Dasar</th>
-                                    <th>Komisi Pusat</th>
-                                    <th>Komisi Mitra</th>
-                                    <th>Harga Jual Pelanggan</th>
-                                    <th>Nominal Piutang</th>
-                                    <th>Pendapatan Mitra</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr v-for="(product, index) in products" :key="index">
-                                    <td class="text-left">
-                                        {{ product['title'] }}
-                                    </td>
-                                    <td>
-                                        13
-                                    </td>
-                                    <td>
-                                        5
-                                    </td>
-                                    <td>
-                                        13
-                                    </td>
-                                    <td>
-                                        13
-                                    </td>
-                                    <td>
-                                        {{ 20000 | formatMoney }}
-                                    </td>
-                                    <td>
-                                        {{ 1000 | formatMoney }}
-                                    </td>
-                                    <td>
-                                        {{ 4000 | formatMoney }}
-                                    </td>
-                                    <td>
-                                        {{ 25000 | formatMoney }}
-                                    </td>
-                                    <td>
-                                        {{ 105000 | formatMoney }}
-                                    </td>
-                                    <td>
-                                        {{ 20000 | formatMoney }}
-                                    </td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
+            <div class="card w-100">
+                <div class="row no-gutters card-body">
+                    <div class="col-md-6">
+                        <form>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Dari :</label>
+                                <p>{{ date[0] | formatDate }}</p>
+                            </div>
+                            <div class="form-group">
+                                <label>Sampai :</label>
+                                <p>{{ date[1] | formatDate}}</p>
+                            </div>
+                        </form>
+                        
+                    </div>
+                    <div class="col-md-6">
+                        Laporan: <button class="btn btn-success" @click="print"><i class="fad fa-file"></i> Cetak Laporan</button>
                     </div>
                 </div>
             </div>
@@ -160,25 +123,74 @@
 <script>
 import axios from "axios"
 import $ from 'jquery'
+import DatePicker from 'vue2-datepicker';
+import 'vue2-datepicker/index.css';
+import moment from 'moment'
+moment.locale('id');  
 
 export default {
     name: "sales_report",
+    components: { DatePicker },
     data(){
         return {
             products: [],
-            search: ""
+            commission: 0,
+            debt: 0,
+            date: [
+                    new Date(),
+                    new Date()
+                ],
         }
     },
     methods: {
+        print(){
+
+            let from = moment(this.date[0]).format("Do-MM-YYYY");
+            let to = moment(this.date[1]).format("Do-MM-YYYY");
+
+            this.$router.push({
+                name:'sales_report_download',
+                query:{
+                        from: from, 
+                        to: to
+                    }
+            })
+
+        },
         getProducts(){
-            return axios.get('https://fakestoreapi.com/products')
+            let today = moment(this.data).format("Do/MM/YYYY");
+
+            return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/sales-report?from=${today}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                    }
+                })
                 .then(results => {
-                    this.products = results.data
+                    console.log(results)
+                    this.commission = results['data']['data']['commission']
+                    this.debt = results['data']['data']['debt']
+                    // this.products = results.data
+                })
+        },
+        getProductsByDate(){
+
+            let from = moment(this.date[0]).format("Do-MM-YYYY");
+            let to = moment(this.date[1]).format("Do-MM-YYYY");
+
+            return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/sales-report?from=${from}&to=${to}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                    }
+                })
+                .then(results => {
+                    this.commission = results['data']['data']['commission']
+                    this.debt = results['data']['data']['debt']
+                    // this.products = results.data
                 })
         },
         openModalFilter(){
             $("#modal-filter").modal('show')
-        }
+        },
     },
     filters: {
         formatMoney(val){
@@ -188,7 +200,10 @@ export default {
             });
 
             return formatter.format(val);
-        }
+        },
+        formatDate(){
+            return moment().format("Do MMMM YYYY");  
+        }  
     },
     created() {
         this.getProducts()

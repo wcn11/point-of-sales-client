@@ -1,36 +1,52 @@
 <template>
 
-    <nav class="nav">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light p-4">
+        <a class="navbar-brand" href="/">
+            <!-- POS Mitra PT. BAC -->
+            <img class="img-fluid" :src="require('./../assets/logo_beliayam_mitra.jpeg')"/>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
 
-        <div class="logo p-2">
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto w-100">
+                <li class="nav-item active">
+                    <a class="nav-link" href="/"><i class="fad fa-warehouse-alt"></i> Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                        <router-link class="nav-link" :to="{ name: 'customers'}"><i class="fad fa-users-class"></i> Pelanggan</router-link>
+                </li>
 
-            <a class="navbar-brand text-decoration-none text-dark" href="/">
-                <img src="./../images/icon.png" width="30" height="30" class="d-inline-block align-top" alt="">
-                POS Mitra PT. BELI AYAM COM
-            </a>
+                <li class="nav-item">
+                        <router-link class="nav-link" :to="{ name: 'stock'}"><i class="fad fa-box"></i> Persediaan</router-link>
+                </li>
 
-        </div>
+                <li class="nav-item">
+                        <router-link class="nav-link" :to="{ name: 'sales_report'}"><i class="fad fa-file-chart-line"></i> Laporan Penjualan</router-link>
+                </li>
 
-        <div class="select menu" @mouseleave="closeMenu">
-            <a href="javascript:void(0)" class="link color-main  dropdown-toggle" id="navigation_2_dropdown_1">{{ menuSelected }}</a>
-            <div class="dropdown-menu">
-                <router-link :to="{ name: 'category'}" class="m-2">Beranda</router-link>
-                <router-link :to="{ name: 'category'}" class="m-2">Produk</router-link>
-                <router-link :to="{ name: 'customers'}" class="m-2">Pelanggan</router-link>
-                <router-link :to="{ name: 'stock'}" class="m-2">Persediaan</router-link>
-                <router-link :to="{ name: 'sale'}" class="m-2">Penjualan</router-link>
-                <router-link :to="{ name: 'sales_report'}" class="m-2">Laporan Penjualan</router-link>
+            </ul>
+            <div class="text-left d-flex">
+
+                <button class="btn btn-default d-flex justify-content-center" @click="openCart">
+                    <i class="fad fa-cart-plus"></i>
+                    {{ carts ? carts.length : 0 }}
+                </button>
+
+                <a href="javascript:void(0)" class="btn btn-default" @click="logout">                
+                    logout
+                </a>
+
+                <!-- <button class="btn btn-cart w-100" @click="openCart"><i class="fad fa-cart-plus"></i>
+                    <span>{{ carts ? carts.length : 0 }}</span>
+                </button> -->
             </div>
+            <!-- <div class="form-inline">
+                    <button class="btn" @click="logout">Logout</button>
+            </div> -->
         </div>
 
-        <div class="login">
-            <button @click="openCart"><i class="fad fa-cart-plus"></i>
-                <span>{{ carts ? carts.length : 0 }}</span>
-            </button>
-            <button @click="logout">Logout</button>
-        </div>
-
-        <!-- Modal -->
         <div class="modal fade animate__animated animate__fadeInUp" id="modal-cart" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered modal-static modal-dialog-scrollable modal-lg">
                 <div class="modal-content modal-bottom">
@@ -47,13 +63,13 @@
                                             <img :src="cart['image'] ? cart['image'] : require('../assets/images/broiler.jpeg')" class='iconDetails' alt="Gambar Ayam">
                                         </div>
                                         <div class="right-cart text-left">
-                                            <h4 class="cart-title-product mb-3">
+                                            <p class="cart-title-product mb-3">
                                                 {{ cart['product']['name'] }}
-                                            </h4>
+                                            </p>
                                             <div class="w-100 mb-3 d-flex">
 
                                                 <sup>Rp</sup> <input @change="checkRequestInput(cart['product']['id'])" type="text" class="form-control-borderless w-50 ml-3 text-center" name="quantity" v-model.number="cart['product']['price']" pattern="[0-9]*"/>
-                                                <!-- {{ cart['product']['unitPrice'] | formatMoney }} -->
+                                               
                                             </div>
                                             <div class="w-100 counter-cart">
                                                 <span @click="removeProduct(cart['product']['id'])" class="mr-5"><i class="fad fa-trash-alt"></i></span>
@@ -68,18 +84,17 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer justify-content-end">
+                        <div class="modal-footer justify-content-around d-flex">
                             <a href="javascript:void(0)" class="btn btn-outline-dark" data-dismiss="modal"><i class="fad fa-times-circle"></i> Tutup</a>
-                            <a href="javascript:void(0)" v-if="carts.length > 0" class="btn btn-outline-dark" @click="openPayment"><i class="fad fa-shopping-basket"></i> Lanjut Ke Pembayaran</a>
+                            <a href="javascript:void(0)" v-if="carts.length > 0" class="btn btn-outline-dark" @click="openPayment"><i class="fad fa-shopping-basket"></i> Bayar</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal -->
         <div class="modal fade animate__animated animate__fadeInUp" id="modal-payment" tabindex="-1">
-            <div class="modal-dialog modal-static modal-dialog-scrollable">
+            <div class="modal-dialog modal-dialog-centered modal-static modal-dialog-scrollable modal-md">
                 <div class="modal-content modal-bottom">
                     <div class="modal-body">
                         <div class="text-center">
@@ -100,20 +115,24 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="form-group row text-left">
                                 <label for="customers" class="col-sm-4 form-control-label">Pelanggan</label>
                                 <div class="col-sm-8 d-flex">
 
+                                    <div class="input-group mb-3">
 
-                                    <select class="form-control" v-model="selectedCustomer" id="customers" data-header="Pilih Pelanggan" data-show-subtext="true" data-live-search="true">
-                                        <option v-for="(customer, index) in customers" :value="customer['id']" :key="index"> 
-                                            <p>{{ customer['name'] }}</p>
-                                            <small> {{ customer['mobilePhone'] }}</small>
-                                        </option>
-                                    </select>
+                                        <select class="form-control" v-model="selectedCustomer" id="customers" data-header="Pilih Pelanggan" data-show-subtext="true" data-live-search="true">
+                                            <option v-for="(customer, index) in customers" :value="customer['id']" :key="index"> 
+                                                <p>{{ customer['name'] }}</p>
+                                                <small> {{ customer['mobilePhone'] }}</small>
+                                            </option>
+                                        </select>
+                                        <!-- <input type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2"> -->
+                                        <div class="input-group-append" @click="openModalAddCustomer">
+                                            <span class="input-group-text" id="basic-addon2" ><i class="fad fa-user-plus"></i></span>
+                                        </div>
+                                    </div>
 
-                                    <button class="btn btn-success ml-2" @click="openModalAddCustomer"><i class="fad fa-plus-circle" aria-hidden="true"></i></button>
                                 </div>
                             </div>
 
@@ -123,7 +142,6 @@
 
                                     <select class="form-control" v-model="selectedPayment" id="paymentMethod" data-header="Pilih Metode Pembayaran" data-show-subtext="true" data-live-search="true">
                                         <option value="cash">Tunai</option>
-                                        <!-- <option value="transfer">Transfer</option> -->
                                     </select>
 
                                 </div>
@@ -131,17 +149,16 @@
 
                         </div>
                         <div class="modal-footer justify-content-around">
-                            <a href="javascript:void(0)" data-dismiss="modal" class="btn btn-outline-dark"><i class="fad fa-times-circle"></i> Batal</a>
-                            <a href="javascript:void(0)" class="btn btn-outline-dark" @click="pay"><i class="fad fa-shopping-basket"></i> Bayar</a>
+                            <button href="javascript:void(0)" data-dismiss="modal" class="btn btn-outline-dark"><i class="fad fa-times-circle"></i> Batal</button>
+                            <button href="javascript:void(0)" :disabled="!isComplete" class="btn btn-outline-dark" @click="pay"><i class="fad fa-shopping-basket"></i> Bayar</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Modal -->
         <div class="modal fade animate__animated animate__fadeInUp" id="modal-add-customer" tabindex="-1">
-            <div class="modal-dialog modal-static modal-dialog-scrollable">
+            <div class="modal-dialog modal-dialog-centered modal-static modal-dialog-scrollable">
                 <div class="modal-content modal-bottom">
                     <div class="modal-body">
                         <div class="text-center">
@@ -216,6 +233,29 @@
             </div>
         </div>
 
+        <div class="modal fade animate__animated animate__fadeInUp" id="modal-print" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-static modal-dialog-scrollable modal-lg">
+                <div class="modal-content modal-bottom">
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <header class="card-header d-flex">
+                                <h2><i class="fad fa-print"></i> Transaksi</h2>
+                            </header>
+
+                            <div>
+                                <button class="btn btn-success" @click="printInvoice"><i class="fad fa-print"></i> Cetak Invoice</button>
+                            </div>
+
+                        </div>
+                        <div class="modal-footer justify-content-around d-flex">
+                            <a href="javascript:void(0)" class="btn btn-outline-dark" data-dismiss="modal"><i class="fad fa-times-circle"></i> Tutup</a>
+                            <a href="javascript:void(0)" v-if="carts.length > 0" class="btn btn-outline-dark" @click="openPayment"><i class="fad fa-shopping-basket"></i> Bayar</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </nav>
 </template>
 
@@ -242,23 +282,34 @@ export default {
                 "billZipCode": "",
                 "notes": "",
             },
-            bill: this.getTotalCart
+            bill: this.getTotalCart,
+            printId: 0,
+            defaultBody: "",
         }
     },
     methods: {
+        printInvoice(){
+
+            $("#modal-print").modal('hide')
+            this.$router.push({
+                name:'invoice',
+                query:{
+                        key: this.printId, 
+                    }
+            })
+        },
         pay(){
 
-            return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/pay`,
-                {
-                    "customerNo": this.selectedCustomer,
+                return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/pay`,{
+                    "carts": this.carts,
                     "paymentAmount": this.bill,
-                    "carts": this.carts
-                },
-                {
+                    "customer": this.selectedCustomer,
+
+                },{
                     headers: {
-                        "Authorization": "Bearer " + localStorage.getItem("jwt")
-                },    
-            })
+                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                    }
+                })
                 .then(results => {
 
                     if(results['data']['s']){
@@ -283,6 +334,16 @@ export default {
 
 
                         this.$root.$emit('clearCarts')
+
+                        results['data']['d'].map(value =>{
+
+                            this.$alertify.success(value)
+                        })
+
+                        this.printId = results['data']['r']['id']
+
+                        $("#modal-print").modal('show')
+
 
                         this.$alertify.success("Berhasil Dibayarkan")
                     }else{
@@ -313,15 +374,14 @@ export default {
         },
         
         saveCustomer(){
-            return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/customers`,
-                {
-                    "customer": this.addCustomer,
-                },
-                {
+
+                return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/customers`,{
+                    "customer" : this.addCustomer,
+                },{
                     headers: {
-                        "Authorization": "Bearer " + localStorage.getItem("jwt")
-                },    
-            })
+                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                    }
+                })
                 .then(results => {
 
                     if(results['data']['s']){
@@ -340,6 +400,12 @@ export default {
                             "billZipCode": "",
                             "notes": "",
                         }
+
+                        if(results['data']['s']){
+                            results['data']['d'].map(value => {
+                                this.$alertify.success(value)
+                            })
+                        }
                     }
                 }).catch(error => {
                         this.$alertify.error(error.response['data']['message'])
@@ -347,7 +413,7 @@ export default {
         },
         
         getCustomers(){
-            return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/customers/52`,{
+            return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/customers/52/category`,{
                 headers: {
                     "Authorization": "Bearer " + localStorage.getItem("jwt")
                 }
@@ -367,7 +433,7 @@ export default {
 
         },
         openModalAddCustomer(){
-
+            
             $("#modal-add-customer").modal('show')
 
             $("#modal-payment").modal('hide')
@@ -425,32 +491,6 @@ export default {
             this.$store.dispatch('setRemoveProductOnCart', id)
 
         },
-        setMenu(){
-
-            let uri = location.pathname.substr(1).toString()
-
-            switch (uri) {
-                case "sales_report":
-                    this.menuSelected = "Laporan Penjualan"
-                    break
-                case "customers":
-                    this.menuSelected = "Pelanggan"
-                    break
-                case "stock":
-                    this.menuSelected = "Persediaan"
-                    break
-                case "sale":
-                    this.menuSelected = "Persediaan"
-                    break
-                case "":
-                    this.menuSelected = "Beranda"
-                    break
-                default:
-                    this.menuSelected = "Produk"
-                    break
-            }
-
-        },
         closeMenu(){
 
             $(".dropdown-menu").removeClass("active")
@@ -458,10 +498,11 @@ export default {
         },
         logout(){
             
-            axios.post(`/logout`, {}, {
-                
+            axios.post(`${process.env.VUE_APP_BASE_HOST_API}/logout`,{},{
                     headers: {
-                        "Authorization": "Bearer " + localStorage.getItem("jwt")
+                        'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
                     }
                 
             }).then( function(result) {
@@ -504,6 +545,12 @@ export default {
 
             return this.bill = this.$store.getters['getTotalCart']
 
+        },
+
+        isComplete(){
+            if(this.selectedCustomer && this.selectedPayment !== 0){
+                return true
+            }
         }
         
     },
@@ -519,9 +566,6 @@ export default {
             return formatter.format(val);
         }
     },
-    mounted() {
-        this.setMenu()
-    },
 
     created() {
         this.setNav()
@@ -531,7 +575,17 @@ export default {
 </script>
 
 <style scoped>
-    .nav {
+
+    .navbar{
+        padding: 1%;
+        border-bottom-left-radius: 15%;
+        border-bottom-right-radius: 15%;
+    }
+
+    .navbar-brand img{
+        width: 50%;
+    }
+    /* .nav {
         display: flex;
         padding: 2rem 0.8rem;
         background: white;
@@ -599,8 +653,11 @@ export default {
     .logo img{
         width: 8%;
     }
-    .nav .login {
+    /* .nav .login {
         position: relative;
+    } */
+    .nav{
+        display: block;
     }
     .nav .login button {
         display: inline-block;
@@ -623,6 +680,10 @@ export default {
     .nav .login button:focus {
         outline: none;
     }
+    .nav-item{
+        margin-left: 3%;
+    }
+
     .nav .login button:hover {
         border-color: #1e0e62;
     }
@@ -633,9 +694,6 @@ export default {
     .card-cart{
         padding: 2%;
         border-radius: 10px;
-    }
-    .logo a img{
-        object-fit: cover;
     }
     .cart-title-product{
         white-space: nowrap;
@@ -679,12 +737,39 @@ export default {
 
     .counter-button:hover{
         cursor: pointer;
+    } 
+
+    .form-inline{
+        width: 5%;
+    }
+
+    .navbar-brand{
+        width: 35%;
+    }
+
+    .input-group-append:hover{
+        cursor: pointer;
     }
 
     @media only screen and (max-width: 600px) {
         .iconDetails {
             width: 75px;
             height: auto;
+        }
+        .modal-bottom{
+            position: absolute;
+            bottom: 0;
+            max-height: 80% !important;
+        }
+        .navbar-brand img{
+            width: 200px;
+        }
+        .form-inline{
+            width: 20%;
+        }
+
+        .navbar-brand{
+            width: 50%;
         }
     }
 

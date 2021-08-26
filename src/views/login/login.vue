@@ -21,6 +21,7 @@
                 <input type="password" v-model="password" name="password" id="password" class="form-control" placeholder="masukan password anda">
               </div>
               <input name="login" id="login" @click="submit" class="btn btn-block login-btn" type="button" value="Login">
+              
             </form>
             <!-- <a href="#!" class="forgot-password-link">Forgot password?</a>
             <p class="login-wrapper-footer-text">Don't have an account? <a href="#!" class="text-reset">Register here</a></p> -->
@@ -53,7 +54,7 @@ export default {
     data(){
         return {
             email: "",
-            password: ""
+            password: "",
         }
     },
     methods: {
@@ -61,8 +62,7 @@ export default {
             axios.post(`${process.env.VUE_APP_BASE_HOST_API}/login`,{
                 "email": this.email,
                 "password": this.password,
-            }
-            ).then(result => {
+            }).then(result => {
 
                 let data = result.data
 
@@ -88,7 +88,7 @@ export default {
 
         },
         removeNav(){
-            document.querySelector('.nav').style.display = 'none'
+            document.querySelector("nav").style.display = "none"
         }
     },
     mounted() {
@@ -97,7 +97,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
     .image-container{
         background-color: red;
     }

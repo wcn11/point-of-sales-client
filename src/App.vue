@@ -9,24 +9,21 @@
 
         </div>
 
-
-      <div class="footer bg-white text-dark">
-        <p class=" p-2">
-        Copyright 2021 by PT BELI AYAM COM. All Rights Reserved.
-        System Version 1.0.2-1 BETA</p>
-      </div>
+        <!-- <FooterView></FooterView> -->
 
   </div>
 </template>
 
 <script>
 import Navigation from './components/navigation.vue'
+import FooterView from './components/footer/footer-view.vue'
 
 
 export default {
   name: 'App',
   components: {
-    Navigation
+    Navigation,
+    // FooterView
   },
 }
 </script>
@@ -37,15 +34,5 @@ export default {
         padding: 0;
         margin: 0;
         font-family: DM Sans;
-    }
-
-    .footer {
-      position: fixed;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background-color: red;
-      color: white;
-      text-align: center;
     }
 </style>
