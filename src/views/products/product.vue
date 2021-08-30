@@ -1,7 +1,7 @@
 <template>
     <div class="">
 
-        <header class="card-header header-category">
+        <header class="card-header header-category" v-if="products">
             <h2 class="headline">
             </h2>
         </header>
@@ -67,25 +67,6 @@
                 </div>
             </div>
 
-        </div>
-
-
-        <!-- Modal -->
-        <div class="modal fade animate__animated animate__fadeInUp" id="modal-payment" tabindex="-1">
-            <div class="modal-dialog modal-dialog-centered modal-static modal-dialog-scrollable modal-lg">
-                <div class="modal-content modal-bottom">
-                    <div class="modal-body">
-                        <div class="text-center">
-                            <h3>
-                                Hapus Produk ?
-                            </h3>
-                        </div>
-                        <div class="modal-footer justify-content-around">
-                        <button class="btn btn-danger w-100" @click="removeProduct(selectedProduct)">Hapus</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         <div class="modal fade" id="openModalRemoveProduct" tabindex="-1">
@@ -155,18 +136,14 @@ export default {
           $("#openModalRemoveProduct").modal(type)
         },
         addProduct(event, product){
-
           axios.get(`${process.env.VUE_APP_BASE_HOST_API}/add-product/${product['no']}`,{
               headers: {
                   "Authorization": "Bearer " + localStorage.getItem("jwt")
               }
           })
             .then(results => {
-
                 if(results['data']['s']){
-
                     if(results['data']['d']['availableStock'] <= 0){
-
                         return this.products.filter(valueproduct => {
                             if(valueproduct['id'] === product['id']){
                                 event.target.innerHTML = "Stok Habis"
@@ -177,23 +154,19 @@ export default {
                         })
                         
                     }else{
-
                             this.products.map(valueProduct => {
                             if(valueProduct['id'] === product['id']){
-
                                 product['additionalPrice'] = 0
                                 product['price'] = product['unitPrice']
                                 product['stock'] = results['data']['d']['availableStock'] - 1
                                 this.$store.dispatch('addProductToCart', product)
                                 valueProduct['selected'] = true
-
                                 console.log(product)
                                 return 
                             }
                             return 
                         })
                     }
-
                 }
             }).catch(error => {
                 console.error(error)

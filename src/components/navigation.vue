@@ -73,7 +73,7 @@
                                                
                                             </div>
                                             <div class="w-100 counter-cart">
-                                                <span @click="removeProduct(cart['id'])" class="mr-5"><i class="fad fa-trash-alt"></i></span>
+                                                <span @click="removeProduct(cart['id'])" class="mr-3 counter-button"><i class="fad fa-trash-alt"></i></span>
                                                 <span @click="updateCart(cart['id'], )" class="counter-button"><i class="fad fa-minus-circle"></i></span>
                                                 <span>
                                                     {{ cart['quantity'] }}
@@ -272,13 +272,27 @@
             </div>
         </div>
 
+        <div class="modal fade" id="openModalRemoveProductNavigation" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered modal-static">
+                <div class="modal-content modal-bottom">
+                    <div class="modal-body">
+                        <div class="text-center">
+                            <h3>
+                                Hapus Produk ?
+                            </h3>
+                        </div>
+                        <button class="btn btn-danger w-100" @click="removeProduct(selectedProduct)">Hapus</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </nav>
 </template>
 
 <script>
 import $ from "jquery"
 import axios from "axios"
-import { mapGetters } from 'vuex';
 export default {
     name: "navigation",
     data(){
@@ -302,6 +316,7 @@ export default {
             printId: 0,
             defaultBody: "",
             totalAdditional : 0,
+            selectedProduct: 0,
             // grandTotal : this.$store.getters['getTotalCart'] + this.totalAdditional,
         }
     },
@@ -379,8 +394,7 @@ export default {
         },
         getCart(){
             return this.carts = this.$store.getters['getCart']
-        },
-        
+        },     
         saveCustomer(){
                 return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/customers`,{
                     "customer" : this.addCustomer,
@@ -442,6 +456,9 @@ export default {
             this.getCustomers()
             $("#modal-payment").modal('show')
         },
+        openModalRemoveProduct(type = "show"){
+          $("#openModalRemoveProductNavigation").modal(type)
+        },
         updateCart(id, type = "minus", event){
             if (type === "minus"){
                 return this.carts.filter(value => {
@@ -449,6 +466,11 @@ export default {
                         if (value['quantity'] > 1){
                             value['stock']++
                             return value['quantity']--
+                        }
+                        if (value['quantity'] === 1){
+                            this.selectedProduct = id
+                            this.openModalRemoveProduct()
+                            return
                         }
                     }
                 })
@@ -488,6 +510,7 @@ export default {
                 }
             })
             this.$store.dispatch('setRemoveProductOnCart', id)
+            this.openModalRemoveProduct('hide')
         },
         closeMenu(){
             $(".dropdown-menu").removeClass("active")

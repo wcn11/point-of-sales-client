@@ -18,15 +18,15 @@ export default new Vuex.Store({
             let total = 0;
             state.cart.filter(value => {
                 total += value['quantity'] * value['price']
-                })
+            })
 
-                return total;
-                },
-                getTotalAdditional: state => {
-                        let total = 0;
-                        state.cart.filter(value => {
-                            total += value['additionalPrice']
-                        })
+            return total;
+            },
+            getTotalAdditional: state => {
+                    let total = 0;
+                    state.cart.filter(value => {
+                        total += value['additionalPrice']
+                    })
 
             return total;
         }
@@ -56,7 +56,7 @@ export default new Vuex.Store({
         },
         REMOVE_PRODUCT_ON_CART(state, id) {
             state.cart.filter((value, index) => {
-                if (value['product']['id'] === id) {
+                if (value['id'] === id) {
                     state.cart.splice(index, 1);
                 }
             })
