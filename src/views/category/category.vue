@@ -79,19 +79,6 @@ import { VclFacebook, VclInstagram, VueContentLoading } from 'vue-content-loadin
                 loadingImageCategory: false,
             }
         },
-        // watch: {
-        //     'categories': {
-        //         handler: function (val, oldVal) {
-        //             if(val){
-        //                 this.loading = true;
-        //             }else{
-        //                 this.loading = false;
-        //             }
-
-        //         },
-        //         deep: true
-        //     }
-        // },
         methods: {
             getImage(slug){
 
@@ -125,7 +112,8 @@ import { VclFacebook, VclInstagram, VueContentLoading } from 'vue-content-loadin
 
                     axios.get(`${process.env.VUE_APP_BASE_HOST_API}/categories`,{
                             headers: {
-                                "Authorization": "Bearer " + localStorage.getItem("jwt")
+                                "Authorization": "Bearer " + localStorage.getItem("jwt"),
+                                "Content-type": "application/json",
                             }
                         }).then(result => {
 

@@ -74,8 +74,7 @@ export default {
                                 this.$router.push(this.$route.params.nextUrl)
                             }
                             else {
-                                    window.location = "/"
-                                    // this.$router.push('/')
+                                window.location = "/"
                             }
                         }
             }).catch(error => {
@@ -98,6 +97,9 @@ export default {
 </script>
 
 <style>
+    nav {
+        display: none;
+    }
     .image-container{
         background-color: red;
     }

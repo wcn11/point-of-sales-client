@@ -73,29 +73,16 @@ export default {
     },
     methods: {
         createPdf(){
-            let url = `/stock/${this.fileId}/download`
-
-                var printWindow = window.open( url, 'Print', 'left=200, top=200, width=950, height=500, toolbar=0, resizable=0', "_target");
-
-                printWindow.addEventListener('load', function() {
-                    if (printWindow.chrome) {
-                        printWindow.print();
-                        setTimeout(function(){
-                            printWindow.close();
-                        }, 500);
-                    } else {
-                        printWindow.print();
-                        printWindow.close();
-                    }
-                }, true);
+            let url = `/stock/download`
+            window.open(url, "_blank").focus()
         },
         getProducts(){
 
             this.loading = !this.loading;
-            return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/stock`,{
+            return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/stocks`,{
 
                 headers: {
-                    "Authorization": "Bearer " + localStorage.getItem("jwt")
+                    "Authorization": "Bearer " + localStorage.getItem("jwt"),
                 },
             })
                 .then(results => {

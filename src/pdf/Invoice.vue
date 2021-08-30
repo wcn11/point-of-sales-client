@@ -62,8 +62,13 @@
           </tr> -->
 
           <tr class="calc-row">
+            <td colspan="2"><small>Biaya Tambahan</small></td>
+            <td><small>{{ total_additional |formatMoney }}</small></td>
+          </tr>
+
+          <tr class="calc-row">
             <td colspan="2">Total</td>
-            <td>{{ invoices['d']['salesAmount'] |formatMoney }}</td>
+            <td>{{ grand_total |formatMoney }}</td>
           </tr>
         </tbody>
       </table>
@@ -86,6 +91,8 @@ export default {
   data() {
     return {
       invoices: [],
+      total_additional: 0,
+      grand_total: 0
     };
   },
   methods: {
@@ -100,10 +107,10 @@ export default {
           }
         )
         .then((results) => {
-          console.log(this.invoices = results['data']['data']);
-          // if(results['data']['success']){
-          //     this.stocks = results['data']['data']
-          // }
+          this.invoices = results['data']['data']['invoices']
+          this.total_additional = results['data']['data']['total_additional']
+          this.grand_total = results['data']['data']['grand_total']
+          
         });
     },
     print() {

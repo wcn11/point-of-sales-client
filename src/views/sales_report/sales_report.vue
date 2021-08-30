@@ -12,7 +12,7 @@
                 <label for="inputPassword" class="col-sm-3 col-form-label">Cari Laporan Penjualan...</label>
 
                 <div class="col-sm-8">
-                    <date-picker v-model="date" type="date" class="w-100" format='YYYY-MM-DD' range placeholder="Pilih Jarak Tanggal"></date-picker>
+                    <date-picker v-model="dateSearch" type="date" class="w-100" format='YYYY-MM-DD' range placeholder="Pilih Jarak Tanggal"></date-picker>
                 </div>
 
             </div>
@@ -21,7 +21,7 @@
                 <div class="col m-2">
                     <button class="btn btn-secondary m-auto" @click="getProductsByDate"><i class="fad fa-search"></i> Cari</button>
                 </div>
-                <div class="col m-2" v-if="date">
+                <div class="col m-2" v-if="dateSearch">
                     <button class="btn btn-default m-auto border" @click="print"><i class="fad fa-print"></i> Print</button>
                 </div>
             </div>
@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <div class="row mt-2">
+        <div class="row mt-2" v-if="dateSearch">
 
             <div class="card w-100">
                 <div class="row no-gutters card-body">
@@ -56,11 +56,11 @@
                         <form>
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Dari :</label>
-                                <p>{{ date[0] | formatDate }}</p>
+                                <p>{{ dateSearch[0] | formatDate }}</p>
                             </div>
                             <div class="form-group">
                                 <label>Sampai :</label>
-                                <p>{{ date[1] | formatDate}}</p>
+                                <p>{{ dateSearch[1] | formatDate}}</p>
                             </div>
                         </form>
                         
@@ -136,17 +136,14 @@ export default {
             products: [],
             commission: 0,
             debt: 0,
-            date: [
-                    new Date(),
-                    new Date()
-                ],
+            dateSearch: ""
         }
     },
     methods: {
         print(){
 
-            let from = moment(this.date[0]).format("Do-MM-YYYY");
-            let to = moment(this.date[1]).format("Do-MM-YYYY");
+            let from = moment(this.dateSearch[0]).format("Do-MM-YYYY");
+            let to = moment(this.dateSearch[1]).format("Do-MM-YYYY");
 
             this.$router.push({
                 name:'sales_report_download',
@@ -158,7 +155,7 @@ export default {
 
         },
         getProducts(){
-            let today = moment(this.data).format("Do/MM/YYYY");
+            let today = moment().format("Do/MM/YYYY");
 
             return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/sales-report?from=${today}`, {
                     headers: {
@@ -174,8 +171,8 @@ export default {
         },
         getProductsByDate(){
 
-            let from = moment(this.date[0]).format("Do-MM-YYYY");
-            let to = moment(this.date[1]).format("Do-MM-YYYY");
+            let from = moment(this.dateSearch[0]).format("Do-MM-YYYY");
+            let to = moment(this.dateSearch[1]).format("Do-MM-YYYY");
 
             return axios.get(`${process.env.VUE_APP_BASE_HOST_API}/sales-report?from=${from}&to=${to}`, {
                     headers: {
@@ -186,6 +183,8 @@ export default {
                     this.commission = results['data']['data']['commission']
                     this.debt = results['data']['data']['debt']
                     // this.products = results.data
+                }).catch(error => {
+                    this.$alertify.error(error.response['data']['message'])
                 })
         },
         openModalFilter(){
@@ -201,8 +200,8 @@ export default {
 
             return formatter.format(val);
         },
-        formatDate(){
-            return moment().format("Do MMMM YYYY");  
+        formatDate(val){
+            return moment(val).format("Do MMMM YYYY");  
         }  
     },
     created() {

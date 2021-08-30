@@ -64,30 +64,46 @@
                                         </div>
                                         <div class="right-cart text-left">
                                             <p class="cart-title-product mb-3">
-                                                {{ cart['product']['name'] }}
+                                                {{ cart['name'] }}
                                             </p>
+                                            <p>Stok: {{ cart['stock'] }}</p>
                                             <div class="w-100 mb-3 d-flex">
 
-                                                <sup>Rp</sup> <input @change="checkRequestInput(cart['product']['id'])" type="text" class="form-control-borderless w-50 ml-3 text-center" name="quantity" v-model.number="cart['product']['price']" pattern="[0-9]*"/>
+                                                <sup>Rp</sup> <input @change="checkRequestInput(cart['id'])" type="text" class="form-control-borderless w-50 ml-3 text-center" name="quantity" v-model.number="cart['price']" pattern="[0-9]*"/>
                                                
                                             </div>
                                             <div class="w-100 counter-cart">
-                                                <span @click="removeProduct(cart['product']['id'])" class="mr-5"><i class="fad fa-trash-alt"></i></span>
-                                                <span @click="updateCart(cart['product']['id'])" class="counter-button"><i class="fad fa-minus-circle"></i></span>
+                                                <span @click="removeProduct(cart['id'])" class="mr-5"><i class="fad fa-trash-alt"></i></span>
+                                                <span @click="updateCart(cart['id'], )" class="counter-button"><i class="fad fa-minus-circle"></i></span>
                                                 <span>
-                                                    {{ cart['product']['quantity'] }}
+                                                    {{ cart['quantity'] }}
                                                 </span>
-                                                <span @click="updateCart(cart['product']['id'], 'plus')" class="counter-button"><i class="fad fa-plus-circle"></i></span>
+                                                <span @click="updateCart(cart['id'], 'plus')" class="counter-button"><i class="fad fa-plus-circle"></i></span>
+                                                <!-- <div>
+                                                    <textarea name="note" id="" cols="30" rows="10" resizable="false"></textarea>
+                                                </div> -->
+                                            </div>
+                                            <div class="w-100 mt-3">
+
+                                                <sup>Rp</sup> <input @change="updateCart(cart['id'], 'additionalPrice', $event)" type="text" class="form-control-borderless w-50 ml-3 text-center" name="additionalPrice" :value="cart['additionalPrice']" pattern="[0-9]*"/>
+                                                <br/><small class="text-center"><i class="fad fa-cart-plus"></i> Biaya tambahan</small>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="modal-footer justify-content-around d-flex">
-                            <a href="javascript:void(0)" class="btn btn-outline-dark" data-dismiss="modal"><i class="fad fa-times-circle"></i> Tutup</a>
-                            <a href="javascript:void(0)" v-if="carts.length > 0" class="btn btn-outline-dark" @click="openPayment"><i class="fad fa-shopping-basket"></i> Bayar</a>
+                    </div>
+                    <div class="modal-footer-custom">
+                        <div>
+                            <p>Total Keranjang: {{ this.$store.getters['getTotalCart'] | formatMoney }}</p> 
+                            <p>Total Keranjang: {{ totalAdditional | formatMoney }}</p>
                         </div>
+                        <div class="text-center modal-footer-custom-button">
+                            <button class="btn btn-outline-dark mr-2" data-dismiss="modal"><i class="fad fa-times-circle"></i> Tutup</button>
+                            <button  v-if="carts.length > 0" class="btn btn-outline-dark mr-2" @click="openPayment"><i class="fad fa-shopping-basket"></i> Bayar</button>
+                        </div>
+                        
                     </div>
                 </div>
             </div>
@@ -262,7 +278,7 @@
 <script>
 import $ from "jquery"
 import axios from "axios"
-
+import { mapGetters } from 'vuex';
 export default {
     name: "navigation",
     data(){
@@ -282,14 +298,24 @@ export default {
                 "billZipCode": "",
                 "notes": "",
             },
-            bill: this.getTotalCart,
+            bill: 0,
             printId: 0,
             defaultBody: "",
+            totalAdditional : 0,
+            // grandTotal : this.$store.getters['getTotalCart'] + this.totalAdditional,
         }
     },
     methods: {
+        getCartTotal(){
+            if(this.carts.length > 0){
+                return this.carts.map(function(value){
+                    let total = 0;
+                    total += value['quantity'] * value['price'] + value['additionalPrice'] 
+                    return total 
+                })
+            }
+        },
         printInvoice(){
-
             $("#modal-print").modal('hide')
             this.$router.push({
                 name:'invoice',
@@ -299,25 +325,21 @@ export default {
             })
         },
         pay(){
-
                 return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/pay`,{
                     "carts": this.carts,
                     "paymentAmount": this.bill,
                     "customer": this.selectedCustomer,
-
+                    "total_additional": this.totalAdditional
                 },{
                     headers: {
-                    'Authorization': `Bearer ${localStorage.getItem('jwt')}`
+                        'Authorization': `Bearer ${localStorage.getItem('jwt')}`
                     }
                 })
                 .then(results => {
-
+                    console.log(results)
                     if(results['data']['s']){
-
                         $("#modal-payment").modal('hide')
-
                         this.getCustomers()
-
                         this.addCustomer = {
                             "name": "",
                             "email": "",
@@ -328,23 +350,14 @@ export default {
                             "billZipCode": "",
                             "notes": "",
                         }
-
                         this.$store.dispatch('setClearCarts')
                         this.carts = []
-
-
                         this.$root.$emit('clearCarts')
-
                         results['data']['d'].map(value =>{
-
                             this.$alertify.success(value)
                         })
-
                         this.printId = results['data']['r']['id']
-
                         $("#modal-print").modal('show')
-
-
                         this.$alertify.success("Berhasil Dibayarkan")
                     }else{
                         results['data']['d'].map(result => {
@@ -352,29 +365,23 @@ export default {
                         })
                     }
                 }).catch(error => {
-                        this.$alertify.error(error.response['data']['message'])
-                    })
+                    console.error(error)
+                        this.$alertify.error(error.response)
+                })
         },
         setNav(){
-
             $('#navigation_2_dropdown_1').on("click", function(){
                 $('.dropdown-menu').toggleClass("active");
             });
-
             $('.dropdown-menu div div').on('click' , function(){	$('#navigation_2_dropdown_1').text($(this).text());
                 $('.dropdown-menu').toggleClass("active");
             })
-
         },
-
         getCart(){
-
             return this.carts = this.$store.getters['getCart']
-
         },
         
         saveCustomer(){
-
                 return axios.post(`${process.env.VUE_APP_BASE_HOST_API}/customers`,{
                     "customer" : this.addCustomer,
                 },{
@@ -383,13 +390,9 @@ export default {
                     }
                 })
                 .then(results => {
-
                     if(results['data']['s']){
-
                         this.getCustomers()
-
                         $("#modal-add-customer").modal('hide')
-
                         this.addCustomer = {
                             "name": "",
                             "email": "",
@@ -400,7 +403,6 @@ export default {
                             "billZipCode": "",
                             "notes": "",
                         }
-
                         if(results['data']['s']){
                             results['data']['d'].map(value => {
                                 this.$alertify.success(value)
@@ -426,75 +428,69 @@ export default {
                     })
         },
         openCart(){
-
             $("#modal-cart").modal('show')
-
             $("#modal-payment").modal('hide')
-
         },
         openModalAddCustomer(){
             
             $("#modal-add-customer").modal('show')
-
             $("#modal-payment").modal('hide')
-
         },
         openPayment(){
-
-            this.getTotalCart()
-
+            this.bill = this.getTotalCart() + this.totalAdditional
             $("#modal-cart").modal('hide')
-
             this.getCustomers()
-
             $("#modal-payment").modal('show')
-
         },
-        updateCart(id, type = "minus"){
-
+        updateCart(id, type = "minus", event){
             if (type === "minus"){
-
                 return this.carts.filter(value => {
-                    if (value['product']['id'] === id){
-                        if (value['product']['quantity'] > 1){
-
-                            value['product']['stock']++
-                            return value['product']['quantity']--
-
+                    if (value['id'] === id){
+                        if (value['quantity'] > 1){
+                            value['stock']++
+                            return value['quantity']--
                         }
                     }
                 })
-
-
-            }
-
-            return this.carts.filter(value => {
-                if (value['product']['id'] === id){
-                    if (value['product']['stock'] > 0){
-
-                        value['product']['stock']--
-                        return value['product']['quantity']++
-
+            }else if(type === 'plus'){
+                return this.carts.filter(value => {
+                    if (value['id'] === id){
+                        if (value['stock'] > 0){
+                            value['stock']--
+                            return value['quantity']++
+                        }
                     }
-                }
+                })
+            }else{
+                return this.carts.filter(value => {
+                    if (value['id'] === id){
+
+                        this.$set(value, "additionalPrice",  parseInt(event.target.value))
+                        this.getTotal()
+                        return 
+                    }
+                })
+            }
+        },
+
+        getTotal(){
+            let total = 0
+            this.carts.map(value => {
+                total += value['additionalPrice']
             })
 
+            this.totalAdditional = total
         },
         removeProduct(id){
-
             this.carts.filter(value => {
                 if (value['productId'] === id){
                     return value['selected'] = false
                 }
             })
-
             this.$store.dispatch('setRemoveProductOnCart', id)
-
         },
         closeMenu(){
-
             $(".dropdown-menu").removeClass("active")
-
         },
         logout(){
             
@@ -506,55 +502,43 @@ export default {
                     }
                 
             }).then( function(result) {
-
                 localStorage.setItem('user', "")
                 localStorage.setItem('jwt', "")
-
                 if(result.data.message){
                     window.location.href = "/login"
                 }
             })
         },
-
-
         checkRequestInput(id){
-
             return this.carts.filter((value) => {
-
-                if(value['product']['id'] === id) {
-
-                    if (value['product']['price'] === "") {
-
-                        value['product']['price'] = value['product']['unitPrice']
+                if(value['id'] === id) {
+                    if (value['price'] === "") {
+                        value['price'] = value['unitPrice']
                         alert("Minimal Data Dimasukkan Adalah 0 Rupiah, Tidak Boleh Kosong!")
-                        return value['product']['unitPrice']
+                        return value['unitPrice']
                     }
-
                     let data = {
                         "id": id,
-                        "price": value['product']['price'],
+                        "price": value['price'],
                     }
-
                     return this.$store.dispatch('updatePriceOnCart', data)
                 }
-
             })
         },
-
         getTotalCart(){
-
             return this.bill = this.$store.getters['getTotalCart']
-
         },
-
         isComplete(){
             if(this.selectedCustomer && this.selectedPayment !== 0){
                 return true
             }
-        }
+        },
         
     },
     computed: {
+        getData(){
+            return this.$store.getters.getTotalCart
+        },
     },
     filters: {
         formatMoney(val){
@@ -562,11 +546,9 @@ export default {
                 style: 'currency',
                 currency: 'IDR',
             });
-
             return formatter.format(val);
         }
     },
-
     created() {
         this.setNav()
         this.getCart()
@@ -575,13 +557,11 @@ export default {
 </script>
 
 <style scoped>
-
     .navbar{
         padding: 1%;
         border-bottom-left-radius: 15%;
         border-bottom-right-radius: 15%;
     }
-
     .navbar-brand img{
         width: 50%;
     }
@@ -683,7 +663,6 @@ export default {
     .nav-item{
         margin-left: 3%;
     }
-
     .nav .login button:hover {
         border-color: #1e0e62;
     }
@@ -728,29 +707,40 @@ export default {
     .counter-cart{
         font-size: 24px;
     }
-
     .form-control-borderless{
         border-right: none;
         border-top: none;
         border-left: none;
     }
-
     .counter-button:hover{
         cursor: pointer;
     } 
-
     .form-inline{
         width: 5%;
     }
-
     .navbar-brand{
         width: 35%;
     }
-
     .input-group-append:hover{
         cursor: pointer;
     }
-
+    .modal-footer{
+        flex-wrap: unset;
+    }
+    .modal-footer-custom{
+        padding: 10px;
+        border-top-left-radius: 10px;
+        border-style: inset;
+        box-shadow: 0px 0px 5px 0px grey;
+        z-index: 1;
+        border-top-right-radius: 10px;
+    }
+    .modal-footer-custom-button{
+        display: flex;
+    }
+    .modal-footer-custom-button{
+        padding: 1%;
+    }
     @media only screen and (max-width: 600px) {
         .iconDetails {
             width: 75px;
@@ -767,10 +757,8 @@ export default {
         .form-inline{
             width: 20%;
         }
-
         .navbar-brand{
             width: 50%;
         }
     }
-
 </style>

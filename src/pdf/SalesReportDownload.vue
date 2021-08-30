@@ -114,7 +114,7 @@ export default {
                 })
         },
         print(){
-            document.title = "Persediaan Mitra"
+            document.title = "Laporan Penjualan Mitra"
             window.print()
         },
     },

@@ -17,8 +17,16 @@ export default new Vuex.Store({
         getTotalCart: state => {
             let total = 0;
             state.cart.filter(value => {
-                total += value['product']['quantity'] * value['product']['price']
-            })
+                total += value['quantity'] * value['price']
+                })
+
+                return total;
+                },
+                getTotalAdditional: state => {
+                        let total = 0;
+                        state.cart.filter(value => {
+                            total += value['additionalPrice']
+                        })
 
             return total;
         }
@@ -55,6 +63,27 @@ export default new Vuex.Store({
         },
         CLEAR_CARTS(state) {
             state.cart = []
+        },
+        SET_ADDITIONAL_PRICE(state, product, additional) {
+            // console.log(additional)
+            // state.cart.filter((value, index) => {
+            //     if (value['id'] === product['id']) {
+            //         state.cart[index]['additionalPrice'] = product['additionalPrice']
+            //     }
+            // })
+
+            // let data = state.cart.find(x => x.id === product['id'])
+
+            // console.log(data)
+
+            // data['additionalPrice'] = additional
+
+            // state.cart.filter((value, index) => {
+            //     if (value['id'] === product.id) {
+            //         value['additionalPrice'] = additional
+            //         // Vue.set(value, "additionalPrice", additional)
+            //     }
+            // })
         },
         UPDATE_PRICE_ON_CART(state, {
             data
@@ -95,6 +124,11 @@ export default new Vuex.Store({
             commit
         }) {
             commit("CLEAR_CARTS");
+        },
+        setAdditionalPrice({
+            commit
+        }, product, additional) {
+            commit("SET_ADDITIONAL_PRICE", product, additional);
         },
         async updatePriceOnCart({
             commit

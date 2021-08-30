@@ -87,7 +87,7 @@ const router = new VueRouter({
                 requiresAuth: false
             }
         }, {
-            path: '/stock/:key/download',
+            path: '/stock/download',
                 name: 'stockDownload',
                 component: StockDownload,
                 meta: {

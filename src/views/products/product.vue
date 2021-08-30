@@ -18,27 +18,20 @@
         <div class="row mt-5">
 
             <!-- <div class="col-md-3 col-sm-4 resource-container">
-
                 <div class="card card-container">
                     <div class="text-center">
-
                         <VueContentLoading :width="210" :height="130" class="shrimmer-container p-2">
-
                             <rect width="210" height="130"/>
-
                         </VueContentLoading>
                     </div>
                     <div class="card-body">
                         <h5 class="card-title card-title-product">{{ product['name'] }}</h5>
-
                         <h6 class="price">{{ product['unitPrice'] | formatMoney }}</h6>
-
                         <div class="d-flex justify-content-center" v-if="isProductOnCart(product['id']) == false">
                             <div class="btn-group w-100" role="group">
                                 <button type="button" :disabled="product['stock'] <= 0" class="btn btn-secondary" @click="addProduct($event, product)"><i class="fad fa-cart-plus"></i> Tambahkan</button>
                             </div>
                         </div>
-
                         <div class="w-100 counter-cart text-center" v-else>
                             <span @click="updateCart(product['id'])" class="counter"><i class="fad fa-minus-circle"></i></span>
                             <span>{{ getQuantity(product['id']) }}</span>
@@ -59,7 +52,7 @@
 
                         <h6 class="price">{{ product['unitPrice'] | formatMoney }}</h6>
 
-                        <div class="d-flex justify-content-center" v-if="isProductOnCart(product['id']) == false">
+                        <div class="d-flex justify-content-center" v-if="isProductOnCart(product) == false">
                             <div class="btn-group w-100" role="group">
                                 <button type="button" :disabled="product['stock'] <= 0" class="btn btn-secondary" @click="addProduct($event, product)"><i class="fad fa-cart-plus"></i> Tambahkan</button>
                             </div>
@@ -75,7 +68,6 @@
             </div>
 
         </div>
-
 
 
         <!-- Modal -->
@@ -117,7 +109,6 @@
 import axios from "axios"
 import $ from "jquery"
 // import { VueContentLoading } from 'vue-content-loading';
-
 export default {
     name: "product",
     metaInfo: {
@@ -150,7 +141,6 @@ export default {
                     value['quantity'] = 1
                     value['stock'] = 1
                     value['selected'] = false
-
                     document.querySelector('.headline').innerHTML = value['itemCategory']['name']
                     return value
                 })
@@ -166,125 +156,109 @@ export default {
         },
         addProduct(event, product){
 
-
-          axios.get(`${process.env.VUE_APP_BASE_HOST_API}/add-product/${product['id']}`,{
+          axios.get(`${process.env.VUE_APP_BASE_HOST_API}/add-product/${product['no']}`,{
               headers: {
                   "Authorization": "Bearer " + localStorage.getItem("jwt")
               }
           })
             .then(results => {
-                results['data']['d']['detailWarehouseData'].filter(value => {
-                    if(value['id'] === 151){
-                        if(value['balance'] <= 0){
-                            return this.products.filter(valueproduct => {
-                                if(valueproduct['id'] === product['id']){
-                                    event.target.innerHTML = "Stok Habis"
-                                    event.target.className += " bg-danger";
-                                    return valueproduct['stock'] = 0
-                                }
-                            })
-                        }else{
-                            return this.products.filter(valueproduct => {
-                                if(valueproduct['id'] === product['id']){
-                                    
-                                    value['product'] = product
-                                    value['product']['price'] = value['product']['unitPrice']
-                                    value['product']['stock'] = value['balance'] - 1
 
-                                    this.$store.dispatch('addProductToCart', value)
-                                    return valueproduct['selected'] = true
-                                }
-                            })
-                        }
+                if(results['data']['s']){
+
+                    if(results['data']['d']['availableStock'] <= 0){
+
+                        return this.products.filter(valueproduct => {
+                            if(valueproduct['id'] === product['id']){
+                                event.target.innerHTML = "Stok Habis"
+                                event.target.className += " bg-danger";
+                                return valueproduct['stock'] = 0
+                            }
+                            
+                        })
+                        
+                    }else{
+
+                            this.products.map(valueProduct => {
+                            if(valueProduct['id'] === product['id']){
+
+                                product['additionalPrice'] = 0
+                                product['price'] = product['unitPrice']
+                                product['stock'] = results['data']['d']['availableStock'] - 1
+                                this.$store.dispatch('addProductToCart', product)
+                                valueProduct['selected'] = true
+
+                                console.log(product)
+                                return 
+                            }
+                            return 
+                        })
                     }
-                })
-            }).catch(error => {
-                        this.$alertify.error(error.response['data']['message'])
-                    })
 
+                }
+            }).catch(error => {
+                console.error(error)
+                        // this.$alertify.error(error.response['data']['message'])
+                    })
         },
         removeProduct(id){
-
             this.cart.filter(value => {
-                if (value['product']['id'] === id){
+                if (value['id'] === id){
                     return value['selected'] = false
                 }
             })
-
             this.openModalRemoveProduct('hide')
-
             this.$store.dispatch('setRemoveProductOnCart', id)
-
         },
         updateCart(id, type = "minus"){
-
             if (type === "minus"){
-
                  return this.cart.filter(value => {
                      
-                    if (value['product']['id'] === id){
-                        if (value['product']['quantity'] > 1){
-
-                            value['product']['stock']++
-                            return value['product']['quantity']--
-
+                    if (value['id'] === id){
+                        if (value['quantity'] > 1){
+                            value['stock']++
+                            return value['quantity']--
                         }
-
-                        if (value['product']['quantity'] === 1){
+                        if (value['quantity'] === 1){
                             this.selectedProduct = id
                             this.openModalRemoveProduct()
                             return
                         }
                     }
                 })
-
-
             }
-
             return this.cart.filter(value => {
-                if (value['product']['id'] === id){
-                    if (value['product']['stock'] > 0){
-
-                        value['product']['stock']--
-                        return value['product']['quantity']++
-
+                if (value['id'] === id){
+                    if (value['stock'] > 0){
+                        value['stock']--
+                        return value['quantity']++
                     }
                 }
             })
-
         },
         getCart(){
         
             return this.cart = this.$store.getters['getCart']
         
         },
-        isProductOnCart(id){
-
+        isProductOnCart(product){
             return this.cart.filter(value => {
-                return value['product']['id'] === id
+                return value['id'] === product.id
             })
-
         },
         getQuantity(id){
-
             let quantity = this.cart.filter(value => {
-                if(value['product']['id'] === id){
-                    return value['product']['quantity']
+                if(value['id'] === id){
+                    return value['quantity']
                 }
             })
-
-            return quantity[0]['product']['quantity']
-
+            return quantity[0]['quantity']
         },
         clearCarts(){
             this.cart = []
         }
-
     },
     computed: {
-
         searchInput(){
-
             if(this.search){
                 return this.products.filter((item)=>{
                     console.log(item.name.toLowerCase().includes(this.search.toLowerCase()))
@@ -292,7 +266,6 @@ export default {
             }else{
                 return this.search;
             }
-
         },
     },
     filters: {
@@ -301,7 +274,6 @@ export default {
                 style: 'currency',
                 currency: 'IDR',
             });
-
             return formatter.format(val);
         }
     },
@@ -315,12 +287,9 @@ export default {
 </script>
 
 <style scoped>
-
     .shrimmer-container{
         border-radius: 10px;
     }
-
-
     .header-category{
         text-align: center;
         background-color: white;
@@ -328,25 +297,20 @@ export default {
         margin: auto;
         margin-top: 2%;
     }
-
     .resource-container {
         margin-bottom: 3%;
     }
-
     .counter:hover{
         cursor: pointer;
     }
-
     .counter-cart{
         font-size: 25px;
     }
-
     .card-container{
         min-height: 100%;
         max-height: 100%;
         border-radius: 10px;
     }
-
     .card-img-top{
         width: 100%;
         object-fit: cover;
@@ -354,7 +318,6 @@ export default {
         border-top-left-radius: 10px;
         border-top-right-radius: 10px;
     }
-
     .card-title-product{
         white-space: pre-wrap;
         text-overflow: ellipsis;
@@ -364,25 +327,18 @@ export default {
         min-height: 48px;
         max-height: 48px;
         -webkit-box-orient: vertical;
-
     }
-
     .price{
         font-size: 25px;
         font-weight: bold;
     }
-
     @media only screen and (max-width: 600px) {
-
         .modal-bottom{
             position: fixed;
             bottom: 0;
         }
-
         .modal-dialog{
             margin: 0;
         }
-
     }
-
 </style>
