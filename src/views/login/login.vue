@@ -66,7 +66,7 @@ export default {
 
                 let data = result.data
 
-                localStorage.setItem('jwt', data['token']['access_token'])
+                localStorage.setItem('jwt', data['data']['token']['access_token'])
 
                         if (localStorage.getItem('jwt') != null){
 
@@ -79,7 +79,7 @@ export default {
                         }
             }).catch(error => {
                 console.log(error.response)
-                this.$alertify.error(error.response['data']['message'])
+                this.$alertify.error(error.response['data']['data']['message'])
 
                 this.email = ""
                 this.password = ""

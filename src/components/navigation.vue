@@ -520,8 +520,6 @@ export default {
             axios.post(`${process.env.VUE_APP_BASE_HOST_API}/logout`,{},{
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem('jwt')}`,
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json',
                     }
                 
             }).then( function(result) {
