@@ -78,8 +78,8 @@ export default {
                             }
                         }
             }).catch(error => {
-                console.log(error.response)
-                this.$alertify.error(error.response['data']['data']['message'])
+                console.log(error.response['data']['message'])
+                this.$alertify.error(error.response['data']['message'])
 
                 this.email = ""
                 this.password = ""
