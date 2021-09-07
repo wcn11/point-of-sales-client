@@ -17,16 +17,16 @@ export default new Vuex.Store({
         getTotalCart: state => {
             let total = 0;
             state.cart.filter(value => {
-                total += value['quantity'] * value['price']
+                total += value['quantity'] * value['grand_price']
             })
 
             return total;
-            },
-            getTotalAdditional: state => {
-                    let total = 0;
-                    state.cart.filter(value => {
-                        total += value['additionalPrice']
-                    })
+        },
+        getTotalAdditional: state => {
+                let total = 0;
+                state.cart.filter(value => {
+                    total += value['additionalPrice']
+                })
 
             return total;
         }
@@ -41,7 +41,7 @@ export default new Vuex.Store({
                 if (value['product']['id'] === id) {
                     if (value['quantity'] > 1) {
                         value['quantity']--
-                        state.cartTotal += value['quantity'] * value['price']
+                        state.cartTotal += value['quantity'] * value['grand_price']
                     }
                 }
             })
@@ -50,7 +50,7 @@ export default new Vuex.Store({
             state.cart.filter(value => {
                 if (value['product']['id'] === id) {
                     value['quantity']++
-                    state.cartTotal += value['quantity'] * value['price']
+                    state.cartTotal += value['quantity'] * value['grand_price']
                 }
             })
         },
@@ -89,9 +89,9 @@ export default new Vuex.Store({
             data
         }) {
             state.cart.filter((value, index) => {
-                if (value['product']['id'] === data['id']) {
+                if (value['id'] === data['id']) {
 
-                    Vue.set(state.cart[index], value['product']['price'], data['price'])
+                    Vue.set(state.cart[index], value['grand_price'], data['grand_price'])
 
                 }
             })

@@ -51,12 +51,12 @@
                     <tr v-for="(item, index2) in sale['sales_item']" :key="index2">
                         <td> {{ index2 + 1 }}</td>
                         <td> {{ item['product_name'] }} </td>
-                        <td> {{ item['price'] - 4000 | formatMoney }}</td>
-                        <td> {{ item['price'] | formatMoney }} </td>
+                        <td> {{ item['basic_price'] + item['centralCommission'] | formatMoney }}</td>
+                        <td> {{ item['grand_price'] | formatMoney }} </td>
                         <td> {{ sale['type'] }} </td>
                         <td> {{ item['quantity'] }} </td>
-                        <td> {{ item['total_price'] - (item['quantity'] * 4000) | formatMoney }}</td>
-                        <td> {{ item['price'] - 4000 | formatMoney }}</td>
+                        <td> {{ (item['basic_price'] + sales['centralCommission']) * item['quantity'] | formatMoney }}</td>
+                        <td> {{ (sales['partnerCommission']) * item['quantity'] | formatMoney }}</td>
                     </tr>
                 </tbody>
                 <tfoot>
