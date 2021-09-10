@@ -39,7 +39,7 @@
             <th>Produk</th>
             <th>SKU</th>
             <th>Kuantitas</th>
-            <th>Harga Satuan</th>
+            <th>Harga Dasar Satuan</th>
           </tr>
         </thead>
         <tbody>
@@ -47,8 +47,8 @@
             <td>{{ index + 1 }}</td>
             <td>{{ stock["name"] }}</td>
             <td>{{ stock["no"] }}</td>
-            <td>{{ stock["stock"] ? stock["stock"] : stock["stock"] }}</td>
-            <td>{{ stock["unitPrice"] | formatMoney }}</td>
+            <td>{{ stock["product_partner"][0]['stock'] }}</td>
+            <td>{{ stock["basic_price"] + stock["centralCommission"] | formatMoney }}</td>
           </tr>
         </tbody>
       </table>
@@ -76,31 +76,33 @@ export default {
         })
         .then((results) => {
           if (results["data"]["success"]) {
-            if (results["data"]["data"]["s"]) {
-              let data = results["data"]["data"]["d"];
+            console.log(results["data"]["data"])
+            this.stocks = results["data"]["data"]
+            // if (results["data"]["data"]["s"]) {
+            //   let data = results["data"]["data"]["d"];
 
-              let stocks = [];
+            //   let stocks = [];
 
-              for (let i = 0; i < data.length; i++) {
-                axios
-                  .get(
-                    `${process.env.VUE_APP_BASE_HOST_API}/stock/${data[i]["no"]}`,
-                    {
-                      headers: {
-                        Authorization: "Bearer " + localStorage.getItem("jwt"),
-                      },
-                    }
-                  )
-                  .then((results) => {
-                    if (results["data"]["data"]["s"]) {
-                      data[i]["stock"] = results["data"]["data"]["d"]["availableStock"];
-                      stocks.push(data[i]);
-                    }
-                  });
-              }
+            //   for (let i = 0; i < data.length; i++) {
+            //     axios
+            //       .get(
+            //         `${process.env.VUE_APP_BASE_HOST_API}/stock/${data[i]["no"]}`,
+            //         {
+            //           headers: {
+            //             Authorization: "Bearer " + localStorage.getItem("jwt"),
+            //           },
+            //         }
+            //       )
+            //       .then((results) => {
+            //         if (results["data"]["data"]["s"]) {
+            //           data[i]["stock"] = results["data"]["data"]["d"]["availableStock"];
+            //           stocks.push(data[i]);
+            //         }
+            //       });
+            //   }
 
-              this.stocks = stocks;
-            }
+            //   this.stocks = stocks;
+            // }
           }
         });
     },

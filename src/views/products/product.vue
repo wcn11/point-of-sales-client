@@ -14,7 +14,6 @@
         </aside> -->
 
     <div class="row mt-5">
-
       <div
         class="col-md-3 col-sm-4 resource-container"
         v-for="(product, index) in products"
@@ -30,12 +29,13 @@
           </div>
           <div class="card-body">
             <h5 class="card-title card-title-product">{{ product["name"] }}</h5>
+            <p>Stok: {{ product["stock"] }}</p>
 
             <h6 class="price">{{ product["grand_price"] | formatMoney }}</h6>
 
             <div
               class="d-flex justify-content-center"
-              v-if="isProductOnCart(product) == false"
+              v-if="isProductOnCart(product) == false && product['stock'] > 0"
             >
               <div class="btn-group w-100" role="group">
                 <button
@@ -45,6 +45,17 @@
                   @click="addProduct($event, product)"
                 >
                   <i class="fad fa-cart-plus"></i> Tambahkan
+                </button>
+              </div>
+            </div>
+
+            <div
+              class="d-flex justify-content-center"
+              v-else-if="product['stock'] <= 0 && product['quantity'] === 0"
+            >
+              <div class="btn-group w-100" role="group">
+                <button type="button" disabled class="btn btn-danger">
+                  <i class="fad fa-cart-plus"></i> Stok Habis
                 </button>
               </div>
             </div>
@@ -111,7 +122,10 @@ export default {
   methods: {
     getImage(value) {
       try {
-        let image = process.env.VUE_APP_BASE_HOST_API + "/" + JSON.parse(value)['thumbURL'];
+        let image =
+          process.env.VUE_APP_BASE_HOST_API +
+          "/" +
+          JSON.parse(value)["thumbURL"];
 
         this.loadingImageCategory = false;
 
@@ -123,7 +137,7 @@ export default {
       }
     },
     getProducts() {
-      this.$root.loading = !this.$root.loading;
+      this.$root.loading = true;
       return axios
         .get(
           `${process.env.VUE_APP_BASE_HOST_API}/products/${this.$route.params["categoryId"]}`,
@@ -134,23 +148,29 @@ export default {
           }
         )
         .then((results) => {
-          if(results['data']['success']){
-            this.products = results['data']["data"].map((value) => {
-              value["quantity"] = 1;
-              value["stock"] = 1;
+          if (results["data"]["success"]) {
+            this.products = results["data"]["data"].map((value) => {
+              console.log(value["product_partner"]);
+              value["quantity"] = 0;
+              value["stock"] = value["product_partner"][0]["stock"];
               value["selected"] = false;
               this.$root.loading = false;
               return value;
             });
+
+            if (this.products.length <= 0) {
+              this.$root.loading = false;
+            }
           }
         })
         .catch((error) => {
-          if(error['response']['data']['success']) {
-          this.$alertify.error(error['response']["data"]["message"]);
-          if (error['response']["data"]["redirect"]) {
-            this.$root.loading = !this.$root.loading;
-            window.location = "/not-found";
-          }
+          console.error(error);
+          if (error["response"]["data"]["success"]) {
+            this.$alertify.error(error["response"]["data"]["message"]);
+            if (error["response"]["data"]["redirect"]) {
+              this.$root.loading = !this.$root.loading;
+              window.location = "/not-found";
+            }
           }
         });
     },
@@ -159,50 +179,21 @@ export default {
     },
     addProduct(event, product) {
       this.$root.loading = !this.$root.loading;
-      axios
-        .get(
-          `${process.env.VUE_APP_BASE_HOST_API}/add-product/${product["no"]}`,
-          {
-            headers: {
-              Authorization: "Bearer " + localStorage.getItem("jwt"),
-            },
-          }
-        )
-        .then((results) => {
-          if (results["data"]["s"]) {
-            if (results["data"]["d"]["availableStock"] <= 0) {
-              return this.products.filter((valueproduct) => {
-                if (valueproduct["id"] === product["id"]) {
-                  event.target.innerHTML = "Stok Habis";
-                  event.target.className += " bg-danger";
-                  this.$root.loading = !this.$root.loading;
-                  return (valueproduct["stock"] = 0);
-                }
-              });
-            } else {
-              this.products.map((valueProduct) => {
-                if (valueProduct["id"] === product["id"]) {
-                  product["additionalPrice"] = 0;
-                  product["price"] = product["unitPrice"];
-                  product["stock"] = results["data"]["d"]["availableStock"] - 1;
-                  this.$store.dispatch("addProductToCart", product);
-                  valueProduct["selected"] = true;
-                  this.$root.loading = !this.$root.loading;
-                  return;
-                }
-                return;
-              });
-            }
-          }
-        })
-        .catch((error) => {
-          console.error(error);
-          // this.$alertify.error(error.response['data']['message'])
-        });
+
+      product["additionalPrice"] = 0;
+      product["quantity"] = 1;
+      product["stock"]--;
+      this.$store.dispatch("addProductToCart", product);
+      product["selected"] = true;
+      this.$root.loading = !this.$root.loading;
+
+      return;
     },
     removeProduct(id) {
       this.cart.filter((value) => {
         if (value["id"] === id) {
+          value["quantity"] = 0
+          value["stock"]++
           return (value["selected"] = false);
         }
       });

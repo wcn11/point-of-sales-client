@@ -57,6 +57,13 @@ export default new Vuex.Store({
         REMOVE_PRODUCT_ON_CART(state, id) {
             state.cart.filter((value, index) => {
                 if (value['id'] === id) {
+                    if (value['quantity'] === 1) {
+                        value["quantity"] = 0
+                        value["stock"]++
+                    } else {
+                        value["stock"] += value['quantity']
+                        value["quantity"] = 0
+                    }
                     state.cart.splice(index, 1);
                 }
             })

@@ -34,6 +34,9 @@
             <div>
                 Tanggal: {{ sale['updated_at'] | formatDate}}
             </div>
+            <div>
+                <button class="btn btn-primary w-25" @click="printInvoice(sale['id'])"><i class="fad fa-print"></i> cetak</button>
+            </div>
             <table class="table table-bordered">
                 <thead>
                     <tr class="heading">
@@ -52,11 +55,11 @@
                         <td> {{ index2 + 1 }}</td>
                         <td> {{ item['product_name'] }} </td>
                         <td> {{ item['basic_price'] + item['centralCommission'] | formatMoney }}</td>
-                        <td> {{ item['grand_price'] | formatMoney }} </td>
+                        <td> {{ (item['basic_price'] + item['centralCommission']) + item['partnerCommission'] | formatMoney }} </td>
                         <td> {{ sale['type'] }} </td>
                         <td> {{ item['quantity'] }} </td>
                         <td> {{ (item['basic_price'] + sales['centralCommission']) * item['quantity'] | formatMoney }}</td>
-                        <td> {{ (sales['partnerCommission']) * item['quantity'] | formatMoney }}</td>
+                        <td> {{ (item['partnerCommission']) * item['quantity'] | formatMoney }}</td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -86,6 +89,9 @@ export default {
         }
     },
     methods:{
+        printInvoice(id){
+            window.open(`/pay/invoice?key=${id}`); 
+        },
         async getSales(){
 
             let from = this.$route.query['from']

@@ -523,7 +523,7 @@ export default {
       carts: this.getCart,
       customers: [],
       selectedCustomer: {},
-      selectedPayment: 0,
+      selectedPayment: 'cash',
       menuSelected: "",
       addCustomer: {
         name: "",
@@ -584,7 +584,7 @@ export default {
           }
         )
         .then((results) => {
-          console.log(results['data']['data']['d'])
+          console.log(results["data"]["data"]["d"]);
           if (results["data"]["success"]) {
             $("#modal-payment").modal("hide");
             this.getCustomers();
@@ -601,10 +601,10 @@ export default {
             this.$store.dispatch("setClearCarts");
             this.carts = [];
             this.$root.$emit("clearCarts");
-            results["data"]['data']["d"].map((value) => {
+            results["data"]["data"]["d"].map((value) => {
               this.$alertify.success(value);
             });
-            this.printId = results["data"]['data']["r"]["id"];
+            this.printId = results["data"]["data"]["r"]["id"];
             $("#modal-print").modal({
               backdrop: "static",
               keyboard: false,
@@ -613,14 +613,14 @@ export default {
             this.$alertify.success("Berhasil Dibayarkan");
             this.$root.loading = !this.$root.loading;
           } else {
-            results["data"]['data']["d"].map((result) => {
+            results["data"]["data"]["d"].map((result) => {
               this.$alertify.warning(result);
             });
           }
         })
         .catch((error) => {
-          console.log(error)
-          this.$alertify.error(error.response['data']['data']['d']);
+          console.log(error);
+          this.$alertify.error(error.response["data"]["data"]["d"]);
           this.$root.loading = !this.$root.loading;
         });
     },
@@ -734,6 +734,9 @@ export default {
       } else {
         return this.carts.filter((value) => {
           if (value["id"] === id) {
+            if(value['stock'] == 0){
+              return 
+            }
             this.$set(value, "additionalPrice", parseInt(event.target.value));
             this.getTotal();
             return;

@@ -21,7 +21,7 @@
       />
     </div>
 
-    <div class="invoice-title">
+    <div class="invoice-title text-center">
       <div id="main-title justify-content-center">
         <p>PT. BELI AYAM COM</p>
         <small
@@ -34,10 +34,10 @@
     <div class="invoice-title">
       <div id="main-title">
         <h4>FAKTUR</h4>
-        <span>#{{ invoices["id"] }}</span>
+        <span class="text-dark font-weight-700">#{{ invoices["id"] }}</span>
       </div>
 
-      <!-- <span id="date">{{ invoices["transDateView"] | formatDate }}</span> -->
+      <span id="date" class="text-dark">{{ invoices["created_at"] | formatDate }}</span>
     </div>
 
     <div class="invoice-details">
@@ -58,7 +58,7 @@
           >
             <td>{{ invoice["product_name"] }}</td>
             <td id="unit">{{ invoice["quantity"] }}</td>
-            <td>{{ (invoice["grand_price"]) | formatMoney }}</td>
+            <td>{{ (invoice["basic_price"] + invoice["centralCommission"]) + invoice["partnerCommission"] | formatMoney }}</td>
           </tr>
 
           <!-- <tr class="row-data">
@@ -124,7 +124,7 @@ export default {
         });
     },
     print() {
-      document.title = "Faktur " + this.invoices['id'];
+      document.title = "Faktur " + this.invoices["id"];
       window.print();
     },
   },
@@ -146,6 +146,8 @@ export default {
 };
 </script>
 
+
+
 <style scoped>
 .invoice-box {
   background-color: #fff !important;
@@ -155,13 +157,9 @@ nav,
 .footer {
   margin-bottom: 3rem;
 }
-
-@import url("https://fonts.googleapis.com/css2?family=Roboto&display=swap");
-
 :root {
   --primary-color: #f5826e;
 }
-
 * {
   margin: 0;
   padding: 0;
@@ -169,11 +167,9 @@ nav,
   font-family: "Roboto", sans-serif;
   letter-spacing: 0.5px;
 }
-
 body {
   background-color: var(--primary-color);
 }
-
 .invoice-card {
   display: flex;
   flex-direction: column;
@@ -188,35 +184,28 @@ body {
   border-radius: 5px;
   box-shadow: 0px 10px 30px 5px rgba(0, 0, 0, 0.15);
 }
-
 .invoice-card > div {
   margin: 5px 0;
 }
-
 .invoice-title {
   flex: 3;
 }
-
 .invoice-title #date {
   display: block;
   margin: 8px 0;
   font-size: 12px;
 }
-
 .invoice-title #main-title {
   display: flex;
   justify-content: space-between;
   margin-top: 2em;
 }
-
 .invoice-title #main-title h4 {
   letter-spacing: 2.5px;
 }
-
 .invoice-title span {
   color: rgba(0, 0, 0, 0.4);
 }
-
 .invoice-details {
   flex: 1;
   border-top: 0.5px dashed grey;
@@ -224,50 +213,41 @@ body {
   display: flex;
   align-items: center;
 }
-
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
 }
-
 .invoice-table thead tr td {
   font-size: 12px;
   letter-spacing: 1px;
   color: grey;
   padding: 8px 0;
 }
-
 .invoice-table thead tr td:nth-last-child(1),
 .row-data td:nth-last-child(1),
 .calc-row td:nth-last-child(1) {
   text-align: right;
 }
-
 .invoice-table tbody tr td {
   padding: 8px 0;
   letter-spacing: 0;
 }
-
 .invoice-table .row-data #unit {
   text-align: center;
 }
-
 .invoice-table .row-data span {
   font-size: 13px;
   color: rgba(0, 0, 0, 0.6);
 }
-
 .invoice-footer {
   flex: 1;
   display: flex;
   justify-content: flex-end;
   align-items: center;
 }
-
 .invoice-footer #later {
   margin-right: 5px;
 }
-
 .btn {
   border: none;
   padding: 5px 0px;
@@ -276,19 +256,15 @@ body {
   letter-spacing: 1px;
   outline: none;
 }
-
 .btn.btn-secondary {
   color: rgba(0, 0, 0, 0.3);
 }
-
 .btn.btn-primary {
   color: var(--primary-color);
 }
-
 .btn#later {
   margin-right: 2em;
 }
-
 @media only screen and (max-width: 600px) {
   .iconDetails {
     width: 75px;
@@ -307,8 +283,10 @@ body {
   .invoice-box {
     margin-top: 0rem !important;
   }
+  .invoice-card{
+    top: 20%;
+  }
 }
-
 @media print {
   body {
     width: 48mm; /*width of index card*/
