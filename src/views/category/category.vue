@@ -5,7 +5,7 @@
       <h2>Kategori Ayam</h2>
     </header>
 
-    <div class="row mt-5" v-if="loading">
+    <div class="row mt-5" v-if="this.$root.loading">
       <div class="col-md-3 col-sm-4" v-for="(count, index) in 8" :key="index">
         <div class="resource">
           <VueContentLoading
@@ -94,7 +94,6 @@ export default {
   data() {
     return {
       categories: [],
-      loading: false,
       loadingImageCategory: false,
     };
   },
@@ -118,7 +117,7 @@ export default {
     },
     getCategory() {
     
-      this.$root.loading = !this.$root.loading
+      this.$root.loading = true
 
       if (this.$root.loading) {
         axios

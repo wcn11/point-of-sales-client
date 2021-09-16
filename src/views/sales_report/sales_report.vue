@@ -397,6 +397,8 @@ export default {
     getProducts() {
       let params = `?from=${moment().format("Do/MM/YYYY")}`;
 
+      this.$root.loading = true;
+
       if (this.dateSearch.length > 0) {
         params = `?from=${moment(this.dateSearch[0]).format(
           "Do-MM-YYYY"
@@ -411,6 +413,7 @@ export default {
         })
         .then((results) => {
           this.sales = results["data"]["data"];
+          this.$root.loading = false;
           // this.commission = results['data']['data']['commission']
           // this.debt = results['data']['data']['debt']
           // this.products = results.data
@@ -420,6 +423,7 @@ export default {
       let from = moment(this.dateSearch[0]).format("Do-MM-YYYY");
       let to = moment(this.dateSearch[1]).format("Do-MM-YYYY");
 
+      this.$root.loading = true;
       return axios
         .get(
           `${process.env.VUE_APP_BASE_HOST_API}/sales-report?from=${from}&to=${to}`,
@@ -432,10 +436,12 @@ export default {
         .then((results) => {
           this.commission = results["data"]["data"]["commission"];
           this.debt = results["data"]["data"]["debt"];
+          this.$root.loading = false;
           // this.products = results.data
         })
         .catch((error) => {
           this.$alertify.error(error.response["data"]["message"]);
+          this.$root.loading = false;
         });
     },
     openModalFilter() {

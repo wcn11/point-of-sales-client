@@ -55,19 +55,12 @@
         <tbody>
           <tr
             class="row-data"
-            v-for="(invoice, index) in invoices['sales_item']"
+            v-for="(invoice, index) in invoices['order_online_item']"
             :key="index"
           >
-            <td>{{ invoice["product_name"] }}</td>
+            <td>{{ invoice["name"] }}</td>
             <td id="unit">{{ invoice["quantity"] }}</td>
-            <td>
-              {{
-                (invoice["basic_price"] +
-                  invoice["centralCommission"] +
-                  invoice["partnerCommission"])
-                  | formatMoney
-              }}
-            </td>
+            <td>{{ invoice["price"] | formatMoney }}</td>
           </tr>
 
           <!-- <tr class="row-data">
@@ -79,16 +72,48 @@
           <tr class="calc-row">
             <td colspan="2"><small>Biaya Tambahan</small></td>
             <td>
-              <small>{{ total_additional | formatMoney }}</small>
+              <small>{{ 0 | formatMoney }}</small>
             </td>
           </tr>
 
           <tr class="calc-row">
             <td colspan="2">Total</td>
-            <td>{{ grand_total | formatMoney }}</td>
+            <td class="border-bottom">{{ invoices["total_price"] | formatMoney }}</td>
+          </tr>
+
+          <tr class="calc-row">
+            <td colspan="2">Pembayaran</td>
+            <td>{{ invoices["payment"] }}</td>
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <div class="invoice-footer text-left justify-content-start">
+      <div>
+        Customer
+        <p>
+          {{ invoices["customer_first_name"] }}
+          {{ invoices["customer_last_name"] }}
+        </p>
+        <p>{{ invoices["phone"] }}</p>
+      </div>
+    </div>
+
+    <div class="invoice-footer text-left justify-content-start">
+      <div>
+        Alamat
+        <p>
+          {{ invoices["address1"] }}
+        </p>
+        <p>{{ invoices["address2"] }}</p>
+        <p>{{ invoices["sub_district"] }}</p>
+        <p>{{ invoices["district"] }}</p>
+        <p>{{ invoices["city"] }}</p>
+        <p>{{ invoices["state"] }}</p>
+        <p>{{ invoices["postcode"] }}</p>
+        <p>{{ invoices["shipping_title"] }}</p>
+      </div>
     </div>
 
     <div class="invoice-footer text-center">
@@ -104,7 +129,7 @@ import moment from "moment";
 moment.locale("id");
 
 export default {
-  name: "Invoice",
+  name: "InvoiceOnline",
   data() {
     return {
       invoices: [],
@@ -114,10 +139,9 @@ export default {
   },
   methods: {
     async getInvoice() {
-      this.$root.loading = true;
       return await axios
         .get(
-          `${process.env.VUE_APP_BASE_HOST_API}/pay/${this.$route.query["key"]}/invoice`,
+          `${process.env.VUE_APP_BASE_HOST_API}/order-online/${this.$route.query["key"]}`,
           {
             headers: {
               Authorization: "Bearer " + localStorage.getItem("jwt"),
@@ -125,12 +149,11 @@ export default {
           }
         )
         .then((results) => {
+          console.log(results["data"]);
           if (results["data"]["success"]) {
-            this.invoices = results["data"]["data"]["invoices"];
-            this.total_additional = results["data"]["data"]["total_additional"];
-            this.grand_total = results["data"]["data"]["grand_total"];
+            this.invoices = results["data"]["data"];
+            this.$root.loading = false;
           }
-          this.$root.loading = false;
         });
     },
     print() {
@@ -147,7 +170,7 @@ export default {
       return formatter.format(val);
     },
     formatDate(date) {
-      return moment(date).format("Do MMMM YYYY H:mm");
+      return moment(date).format("Do MMMM YYYY h:mm");
     },
   },
   created() {
@@ -185,7 +208,7 @@ body {
   flex-direction: column;
   position: absolute;
   padding: 10px 2em;
-  top: 55%;
+  top: 85%;
   left: 50%;
   transform: translate(-50%, -50%);
   min-height: 25em;
@@ -294,7 +317,7 @@ body {
     margin-top: 0rem !important;
   }
   .invoice-card {
-    top: 20%;
+    top: 30%;
   }
 }
 @media print {

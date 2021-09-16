@@ -78,31 +78,6 @@ export default {
           if (results["data"]["success"]) {
             console.log(results["data"]["data"])
             this.stocks = results["data"]["data"]
-            // if (results["data"]["data"]["s"]) {
-            //   let data = results["data"]["data"]["d"];
-
-            //   let stocks = [];
-
-            //   for (let i = 0; i < data.length; i++) {
-            //     axios
-            //       .get(
-            //         `${process.env.VUE_APP_BASE_HOST_API}/stock/${data[i]["no"]}`,
-            //         {
-            //           headers: {
-            //             Authorization: "Bearer " + localStorage.getItem("jwt"),
-            //           },
-            //         }
-            //       )
-            //       .then((results) => {
-            //         if (results["data"]["data"]["s"]) {
-            //           data[i]["stock"] = results["data"]["data"]["d"]["availableStock"];
-            //           stocks.push(data[i]);
-            //         }
-            //       });
-            //   }
-
-            //   this.stocks = stocks;
-            // }
           }
         });
     },

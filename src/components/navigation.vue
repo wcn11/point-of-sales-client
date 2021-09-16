@@ -28,9 +28,15 @@
           >
         </li>
         <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'orders' }"
+            ><i class="fad fa-list-ol"></i> Pemesanan
+            <span class="bg-info order-total">{{ getOrderOnline }}</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
           <router-link class="nav-link" :to="{ name: 'customers' }"
-            ><i class="fad fa-users-class"></i> Pelanggan</router-link
-          >
+            ><i class="fad fa-users-class"></i> Pelanggan
+          </router-link>
         </li>
 
         <li class="nav-item">
@@ -516,6 +522,8 @@
 <script>
 import $ from "jquery";
 import axios from "axios";
+import { mapGetters } from "vuex";
+
 export default {
   name: "navigation",
   data() {
@@ -523,7 +531,7 @@ export default {
       carts: this.getCart,
       customers: [],
       selectedCustomer: {},
-      selectedPayment: 'cash',
+      selectedPayment: "cash",
       menuSelected: "",
       addCustomer: {
         name: "",
@@ -540,7 +548,7 @@ export default {
       defaultBody: "",
       totalAdditional: 0,
       selectedProduct: 0,
-      // grandTotal : this.$store.getters['getTotalCart'] + this.totalAdditional,
+      orders: []
     };
   },
   methods: {
@@ -734,8 +742,8 @@ export default {
       } else {
         return this.carts.filter((value) => {
           if (value["id"] === id) {
-            if(value['stock'] == 0){
-              return 
+            if (value["stock"] == 0) {
+              return;
             }
             this.$set(value, "additionalPrice", parseInt(event.target.value));
             this.getTotal();
@@ -838,11 +846,16 @@ export default {
         return image;
       }
     },
+    getOrders() {
+      this.$root.loading = true;
+      this.$store.dispatch("getOrdersOnline");
+    },
   },
   computed: {
     getData() {
       return this.$store.getters.getTotalCart;
     },
+    ...mapGetters(['getOrderOnline'])
   },
   filters: {
     formatMoney(val) {
@@ -856,6 +869,7 @@ export default {
   created() {
     this.setNav();
     this.getCart();
+    this.getOrders();
   },
 };
 </script>
@@ -869,77 +883,12 @@ export default {
 .navbar-brand img {
   width: 50%;
 }
-/* .nav {
-        display: flex;
-        padding: 2rem 0.8rem;
-        background: white;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom-left-radius: 12%;
-        border-bottom-right-radius: 12%;
-    }
-    .nav .select {
-        position: relative;
-    }
-    .nav .select a {
-        padding: 8px 16px;
-        width: 150px;
-        border: none;
-        border-radius: 10px;
-        text-decoration: none;
-        background: rgba(0, 0, 0, 0.05);
-        color: #1e0e62;
-        font-weight: 600;
-        font-size: 16px;
-        display: block;
-        transition: all 0.25s;
-    }
-    .nav .select a:before {
-        font-family: "Font Awesome 5 Free";
-        font-weight: 900;
-        position: absolute;
-        right: 10px;
-        top: 10px;
-        color: #1e0e62;
-    }
-    .nav .select .dropdown-menu {
-        position: absolute;
-        top: 100%;
-        left: 0;
-        z-index: 1000;
-        float: left;
-        min-width: 10rem;
-        padding: 0.5rem 0;
-        margin: 0.125rem 0 0;
-        font-size: 1rem;
-        color: #212529;
-        text-align: left;
-        list-style: none;
-        padding: 8px 16px;
-        background: white;
-        margin-top: 10px;
-        border-radius: 10px;
-        box-shadow: rgba(0, 0, 0, 0.05) -3px 3px 6px, rgba(0, 0, 0, 0.055) -20px 20px 55px, rgba(255, 255, 255, 0.6) -2px 2px 2px 1px inset, rgba(255, 255, 255, 0.4) 2px 2px 3px 0px inset, rgba(0, 0, 0, 0.05) 1px 1px 2px 0px inset;
-        display: none;
-        transition: 0.25s opacity;
-    }
-    .nav .select .dropdown-menu.active {
-        display: block;
-    }
-    .nav .select .dropdown-menu div {
-        margin-bottom: 1em;
-        font-weight: 600;
-        color: #1e0e62;
-        cursor: pointer;
-        padding: 16px;
-        border-bottom: 2px solid #1e0e6269;
-    }
-    .logo img{
-        width: 8%;
-    }
-    /* .nav .login {
-        position: relative;
-    } */
+
+.order-total {
+  padding: 10px;
+  border-radius: 50%;
+  color: #fff;
+}
 .nav {
   display: block;
 }

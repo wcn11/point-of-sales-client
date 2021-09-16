@@ -1,7 +1,7 @@
 import Vue from "vue";
 import VueRouter from "vue-router";
 
-import Category from '../views/category/category'
+import Category from '../views/category/category.vue'
 import Product from '../views/products/product'
 import Customers from '../views/customers/customers'
 import Stock from '../views/stock/stock'
@@ -12,6 +12,8 @@ import StockDownload from '../pdf/stockDownload'
 import notFound from '../components/notFound.vue'
 import SalesReportDownload from '../pdf/SalesReportDownload.vue'
 import Invoice from '../pdf/Invoice.vue'
+import Order from '../views/order/order.vue'
+import InvoiceOnline from '../pdf/InvoiceOnline.vue'
 
 Vue.use(VueRouter)
 
@@ -24,11 +26,17 @@ const router = new VueRouter({
             meta: {
                 requiresAuth: true
             }
-        },
-        {
+        }, {
             path: '/products/:categoryId',
             name: 'products',
             component: Product,
+            meta: {
+                requiresAuth: true
+            }
+        }, {
+            path: '/orders',
+            name: 'orders',
+            component: Order,
             meta: {
                 requiresAuth: true
             }
@@ -61,6 +69,13 @@ const router = new VueRouter({
             path: '/sales-report',
             name: 'sales_report',
             component: SalesReport,
+            meta: {
+                requiresAuth: true
+            }
+        }, {
+            path: '/orders/invoice',
+            name: 'invoiceOrderOnline',
+            component: InvoiceOnline,
             meta: {
                 requiresAuth: true
             }

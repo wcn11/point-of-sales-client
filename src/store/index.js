@@ -1,3 +1,4 @@
+import axios from "axios";
 import Vue from "vue";
 import Vuex from "vuex";
 
@@ -7,6 +8,7 @@ export default new Vuex.Store({
     state: {
         cart: [],
         isLogged: 0,
+        orders: 0
     },
 
     getters: {
@@ -23,13 +25,14 @@ export default new Vuex.Store({
             return total;
         },
         getTotalAdditional: state => {
-                let total = 0;
-                state.cart.filter(value => {
-                    total += value['additionalPrice']
-                })
+            let total = 0;
+            state.cart.filter(value => {
+                total += value['additionalPrice']
+            })
 
             return total;
-        }
+        },
+        getOrderOnline: state => state.orders
     },
 
     mutations: {
@@ -71,27 +74,7 @@ export default new Vuex.Store({
         CLEAR_CARTS(state) {
             state.cart = []
         },
-        SET_ADDITIONAL_PRICE(state, product, additional) {
-            // console.log(additional)
-            // state.cart.filter((value, index) => {
-            //     if (value['id'] === product['id']) {
-            //         state.cart[index]['additionalPrice'] = product['additionalPrice']
-            //     }
-            // })
-
-            // let data = state.cart.find(x => x.id === product['id'])
-
-            // console.log(data)
-
-            // data['additionalPrice'] = additional
-
-            // state.cart.filter((value, index) => {
-            //     if (value['id'] === product.id) {
-            //         value['additionalPrice'] = additional
-            //         // Vue.set(value, "additionalPrice", additional)
-            //     }
-            // })
-        },
+        SET_ADDITIONAL_PRICE(state, product, additional) {},
         UPDATE_PRICE_ON_CART(state, {
             data
         }) {
@@ -102,6 +85,28 @@ export default new Vuex.Store({
 
                 }
             })
+
+        },
+        GET_ORDER_ONLINE_DATA(state) {
+
+                if (localStorage.getItem('pending_orders') === undefined || localStorage.getItem('pending_orders') === null) {
+
+                    return axios
+                        .get(`${process.env.VUE_APP_BASE_HOST_API}/order-online`, {
+                            headers: {
+                                Authorization: "Bearer " + localStorage.getItem("jwt"),
+                            },
+                        })
+                        .then((results) => {
+                            if (results["data"]["success"]) {
+                                state.orders = results["data"]["data"].length;
+                                localStorage.setItem('pending_orders', results["data"]["data"].length)
+                            }
+                        })
+                }
+
+
+                return state.orders = localStorage.getItem('pending_orders')
 
         },
     },
@@ -142,6 +147,13 @@ export default new Vuex.Store({
         }, data) {
             commit("UPDATE_PRICE_ON_CART", {
                 data,
+                commit
+            });
+        },
+        getOrdersOnline({
+            commit
+        }) {
+            commit("GET_ORDER_ONLINE_DATA", {
                 commit
             });
         },

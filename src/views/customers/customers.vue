@@ -405,7 +405,6 @@ export default {
                 this.$alertify.success(value);
               });
             }
-            
           } else {
             results["data"]["d"].map((value) => {
               this.$alertify.warning(value);
@@ -484,6 +483,7 @@ export default {
         });
     },
     getCustomers() {
+      this.$root.loading = true;
       return axios
         .get(`${process.env.VUE_APP_BASE_HOST_API}/customers`, {
           headers: {
@@ -492,9 +492,11 @@ export default {
         })
         .then((results) => {
           this.customers = results.data["d"];
+          this.$root.loading = false;
         })
         .catch((error) => {
           console.log(error.response);
+          this.$root.loading = false;
           this.$alertify.error(error.response["data"]["message"]);
         });
     },

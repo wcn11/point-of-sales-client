@@ -9,12 +9,13 @@
     <!-- <FooterView></FooterView> -->
 
     <div class="loading-container w-100" v-if="this.$root.loading">
-      <SwappingSquaresSpinner
-        :animation-duration="1000"
-        :size="60"
-        :color="'#ff1d5e'"
-        class="text-center loading-bar w-100"
-      />
+      <div class="animate__animated animate__bounce infinite animate__infinite">
+        <img
+          :src="require('./assets/logo.png')"
+          alt="Loading"
+          class="img-fluid img-loading"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -22,19 +23,15 @@
 <script>
 import Navigation from "./components/navigation.vue";
 import FooterView from "./components/footer/footer-view.vue";
-import { SwappingSquaresSpinner } from "epic-spinners";
 
 export default {
   name: "App",
   components: {
-    Navigation,
-    SwappingSquaresSpinner,
-    // FooterView
+    Navigation
   },
-  data(){
-    return {
-    }
-  }
+  data() {
+    return {};
+  },
 };
 </script>
 
@@ -52,9 +49,19 @@ body {
   height: 100%;
   z-index: 1060;
 }
+.loading-container div {
+  text-align: center;
+  top: 50%;
+  bottom: 50%;
+  position: relative;
+}
 
 .loading-bar {
   top: 50%;
   bottom: 50%;
+}
+
+.img-loading {
+  width: 100px;
 }
 </style>

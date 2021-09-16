@@ -13,7 +13,7 @@
                 </div>
         </aside> -->
 
-    <div class="row mt-5">
+    <!-- <div class="row mt-5">
       <div
         class="col-md-3 col-sm-4 resource-container"
         v-for="(product, index) in products"
@@ -72,7 +72,76 @@
           </div>
         </div>
       </div>
-    </div>
+    </div> -->
+
+    <section style="margin-top: 7rem">
+      <div class="row">
+        <div class="col-lg-12 d-flex">
+          <div
+            class="col-md-4 product-container"
+            v-for="(product, index) in products"
+            :key="index"
+          >
+            <div class="card-product">
+              <span class="title-diskon">#DirumahAja</span>
+              <img
+                class="img-product img-responsive img-rounded"
+                :src="getImage(product['image'])"
+                alt="Gambar Ayam"
+              />
+              <div class="card-container">
+                <h4 class="text-title">
+                  <b>{{ product["name"] }}</b>
+                </h4>
+                <p class="text-weight">
+                  <i class="fas fa-weight"></i> Stok {{ product["stock"] }} PCS
+                </p>
+                <div class="text-desc">
+                  {{ product["grand_price"] | formatMoney }}
+                </div>
+                <p class="text-free">
+                  <i class="fas fa-dolly-flatbed"></i> Gratis Ongkir Tanpa Min.
+                  Order
+                </p>
+                <button
+                  href="#"
+                  class="btn-pesan"
+                  v-if="
+                    isProductOnCart(product) == false && product['stock'] > 0
+                  "
+                  @click="addProduct($event, product)"
+                >
+                  <i class="fas fa-cart-plus"></i>
+                  tambahkan ke keranjang
+                </button>
+                <button
+                  href="#"
+                  class="btn-pesan bg-danger" 
+                  disabled="disabled"
+                  v-else-if="product['stock'] <= 0 && product['quantity'] === 0"
+                  @click="addProduct($event, product)"
+                >
+                  <i class="fas fa-cart-plus"></i>
+                  stok habis
+                </button>
+
+                <div class="w-100 counter-cart text-center" v-else>
+                  <span @click="updateCart(product['id'])" class="counter"
+                    ><i class="fad fa-minus-circle"></i
+                  ></span>
+                  <span>{{ getQuantity(product["id"]) }}</span>
+                  <span
+                    @click="updateCart(product['id'], 'plus')"
+                    class="counter"
+                    ><i class="fad fa-plus-circle"></i
+                  ></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
 
     <div class="modal fade" id="openModalRemoveProduct" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered modal-static">
@@ -192,8 +261,8 @@ export default {
     removeProduct(id) {
       this.cart.filter((value) => {
         if (value["id"] === id) {
-          value["quantity"] = 0
-          value["stock"]++
+          value["quantity"] = 0;
+          value["stock"]++;
           return (value["selected"] = false);
         }
       });
@@ -322,6 +391,106 @@ export default {
   font-size: 25px;
   font-weight: bold;
 }
+
+.text-produk-kategori {
+  padding-top: 4rem;
+  font-size: 4rem;
+  text-align: center;
+}
+
+.img-cover {
+  display: block;
+  position: relative;
+  margin: 0;
+  border-radius: 16px;
+  box-shadow: 10xp 10px 1px grey;
+  box-shadow: 0px 2px 4px gray;
+}
+
+.card-product {
+  box-shadow: 0 0px 5px 0px rgba(0, 0, 0, 0.2);
+  transition: 0.3s;
+  width: 100%;
+  border-radius: 5px;
+  border-bottom-left-radius: 15px;
+  border-bottom-right-radius: 15px;
+}
+
+.card-product:hover {
+  box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.2);
+}
+
+.img-product {
+  border-radius: 5px 5px 5px 5px;
+  min-height: 223px;
+  max-height: 223px;
+  width: 100%;
+}
+
+.card-container {
+  padding: 2px 16px;
+  margin-top: 15px;
+}
+
+.btn-pesan {
+  background-color: #ce1700;
+  color: white;
+  padding: 7px;
+  width: 100%;
+  display: block;
+  border-radius: 5px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: bolder;
+  text-decoration: none;
+  margin: auto;
+  margin-bottom: auto;
+  margin-bottom: 10px;
+}
+
+.btn-pesan:hover {
+  color: white;
+  text-decoration: none;
+  background-color: #bb1a05;
+}
+
+.product-container {
+  padding: 1rem;
+}
+
+.title-diskon {
+  position: absolute;
+  text-align: right;
+  color: white;
+  background-color: #ce1700;
+  padding: 1rem;
+  font-weight: bolder;
+  font-size: 10px;
+  border-bottom-right-radius: 5px;
+  border-top-left-radius: 5px;
+}
+
+.text-title {
+  font-size: 2rem;
+}
+
+.text-desc {
+  margin: 10px;
+  font-weight: bold;
+  color: #f04630;
+  text-align: right;
+  font-size: 22px;
+}
+
+.text-weight {
+  font-size: 14px;
+  color: #ce1700;
+}
+
+.text-free {
+  text-align: center;
+}
+
 @media only screen and (max-width: 600px) {
   .modal-bottom {
     position: fixed;

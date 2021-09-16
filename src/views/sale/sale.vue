@@ -91,10 +91,10 @@ export default {
     },
     methods: {
         getProducts(){
-            return axios.get('https://fakestoreapi.com/products')
-                .then(results => {
-                    this.products = results.data
-                })
+            // return axios.get('https://fakestoreapi.com/products')
+            //     .then(results => {
+            //         this.products = results.data
+            //     })
         },
     },
     created() {
