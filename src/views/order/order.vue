@@ -85,7 +85,14 @@
                     >{{ order["updated_at"] | formatTime }}</span
                   >
                 </p>
+                
               </div>
+              <p class="text-dark mb-2">
+                <span class="mr-2"
+                  ><i class="fad fa-circle"></i>
+                  #{{ order["web_order_id"] }}</span
+                >
+              </p>
               <p class="text-dark mb-2">
                 <span class="mr-2 text-white bg-success p-1"
                   ><i class="fad fa-percentage"></i>
@@ -241,6 +248,12 @@
                   >
                 </p>
               </div>
+              <p class="text-dark mb-2">
+                <span class="mr-2"
+                  ><i class="fad fa-circle"></i>
+                  #{{ order["web_order_id"] }}</span
+                >
+              </p>
               <p class="text-dark mb-2">
                 <span class="mr-2 text-white bg-success p-1"
                   ><i class="fad fa-percentage"></i>
@@ -616,6 +629,9 @@ export default {
             this.ordersPending = results["data"]["data"].filter(
               (order) => order.status == "pending"
             );
+
+            localStorage.setItem("pending_orders", this.ordersPending.length);
+
             this.ordersSucceed = results["data"]["data"].filter(
               (order) => order.status == "completed"
             );

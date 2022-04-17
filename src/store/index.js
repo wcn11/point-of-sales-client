@@ -32,7 +32,6 @@ export default new Vuex.Store({
 
             return total;
         },
-        getOrderOnline: state => state.orders
     },
 
     mutations: {
@@ -89,24 +88,24 @@ export default new Vuex.Store({
         },
         GET_ORDER_ONLINE_DATA(state) {
 
-                if (localStorage.getItem('pending_orders') === undefined || localStorage.getItem('pending_orders') === null) {
+                // if (localStorage.getItem('pending_orders') === undefined || localStorage.getItem('pending_orders') === null) {
 
-                    return axios
-                        .get(`${process.env.VUE_APP_BASE_HOST_API}/order-online`, {
-                            headers: {
-                                Authorization: "Bearer " + localStorage.getItem("jwt"),
-                            },
-                        })
-                        .then((results) => {
-                            if (results["data"]["success"]) {
-                                state.orders = results["data"]["data"].length;
-                                localStorage.setItem('pending_orders', results["data"]["data"].length)
-                            }
-                        })
-                }
+                //     return axios
+                //         .get(`${process.env.VUE_APP_BASE_HOST_API}/order-online`, {
+                //             headers: {
+                //                 Authorization: "Bearer " + localStorage.getItem("jwt"),
+                //             },
+                //         })
+                //         .then((results) => {
+                //             if (results["data"]["success"]) {
+                //                 state.orders = results["data"]["data"].length;
+                //                 localStorage.setItem('pending_orders', results["data"]["data"].length)
+                //             }
+                //         })
+                // }
 
 
-                return state.orders = localStorage.getItem('pending_orders')
+                return localStorage.getItem('pending_orders')
 
         },
     },
@@ -150,12 +149,12 @@ export default new Vuex.Store({
                 commit
             });
         },
-        getOrdersOnline({
-            commit
-        }) {
-            commit("GET_ORDER_ONLINE_DATA", {
-                commit
-            });
-        },
+        // getOrdersOnline({
+        //     commit
+        // }) {
+        //     commit("GET_ORDER_ONLINE_DATA", {
+        //         commit
+        //     });
+        // },
     }
 });

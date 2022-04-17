@@ -30,7 +30,7 @@
         <li class="nav-item">
           <router-link class="nav-link" :to="{ name: 'orders' }"
             ><i class="fad fa-list-ol"></i> Pemesanan
-            <span class="bg-info order-total">{{ getOrderOnline }}</span>
+            <span class="bg-info order-total">{{ orders }}</span>
           </router-link>
         </li>
         <li class="nav-item">
@@ -548,7 +548,7 @@ export default {
       defaultBody: "",
       totalAdditional: 0,
       selectedProduct: 0,
-      orders: []
+      orders: 0,
     };
   },
   methods: {
@@ -848,14 +848,17 @@ export default {
     },
     getOrders() {
       this.$root.loading = true;
-      this.$store.dispatch("getOrdersOnline");
+      let order = localStorage.getItem("pending_orders");
+      if (order === null || order === undefined) {
+        return this.orders
+      }
+      return this.orders = order;
     },
   },
   computed: {
     getData() {
       return this.$store.getters.getTotalCart;
     },
-    ...mapGetters(['getOrderOnline'])
   },
   filters: {
     formatMoney(val) {
